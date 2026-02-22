@@ -508,6 +508,182 @@ function showToast(msg) {
 }
 
 let revealTimeout = null;
+
+  // === Credential loading / reveal logic (FIX) ===
+  let currentCredential = null;
+
+  function normalizeRpcRow(d){
+    if(!d) return null;
+    if(Array.isArray(d)) return d[0] || null;
+    // Some RPCs return { data: [...] } shapes (rare)
+    if(d.data && Array.isArray(d.data)) return d.data[0] || null;
+    return d;
+  }
+
+  function pick(obj, keys){
+    for(const k of keys){
+      if(obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+    }
+    return null;
+  }
+
+  function fmtDDMM(dateLike){
+    if(!dateLike) return "—";
+    const dt = new Date(dateLike);
+    if(isNaN(dt.getTime())) return "—";
+    const dd = String(dt.getDate()).padStart(2,"0");
+    const mm = String(dt.getMonth()+1).padStart(2,"0");
+    return `${dd}/${mm}`;
+  }
+
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+  function setDaysHeader(days){
+    const numEl = document.querySelector(".days-badge .num");
+    const lblEl = document.querySelector(".days-badge .lbl");
+    if(numEl) numEl.textContent = (days ?? "—");
+    if(lblEl) lblEl.textContent = "DIAS";
+  }
+
+  function setCycleLabels(start, end){
+    const spans = document.querySelectorAll(".progress-row span");
+    if(spans && spans.length >= 2){
+      spans[0].textContent = `Início: ${fmtDDMM(start)}`;
+      spans[spans.length-1].textContent = `Fim: ${fmtDDMM(end)}`;
+    }
+  }
+
+  function setProgress(start, end){
+    const fill = document.querySelector(".progress-fill");
+    if(!fill) return;
+    const s = start ? new Date(start).getTime() : NaN;
+    const e = end ? new Date(end).getTime() : NaN;
+    const now = Date.now();
+    let pct = 0;
+    if(!isNaN(s) && !isNaN(e) && e > s){
+      pct = clamp01((now - s) / (e - s));
+    }
+    fill.style.width = `${Math.round(pct*100)}%`;
+  }
+
+  function setCredentialUI(email, passwordMasked){
+    const emailEl = document.getElementById("credEmail");
+    const passEl = document.getElementById("credPass");
+    if(emailEl) emailEl.textContent = email || "—";
+    if(passEl) passEl.textContent = passwordMasked || "••••••••••";
+  }
+
+  function maskPassword(pwd){
+    if(!pwd) return "••••••••••";
+    const n = Math.max(10, Math.min(14, pwd.length));
+    return "•".repeat(n);
+  }
+
+  function lockRevealUI(locked, message){
+    const btn = document.getElementById("btnReveal");
+    const helper = document.getElementById("revealTimer");
+    if(btn){
+      btn.disabled = !!locked;
+      btn.classList.toggle("disabled", !!locked);
+      btn.textContent = locked ? "Bloqueado" : "Liberar";
+    }
+    if(helper){
+      helper.textContent = message || "";
+    }
+  }
+
+  async function loadCredential(){
+    // Requires logged session
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user){
+      lockRevealUI(true, "");
+      currentCredential = null;
+      return null;
+    }
+
+    let row = null;
+    try{
+      const { data, error } = await sb.rpc("get_veo3_credential");
+      if(error) throw error;
+      row = normalizeRpcRow(data);
+    }catch(e){
+      console.error("RPC get_veo3_credential error:", e);
+      toast("Erro ao carregar credenciais. Verifique a RPC e RLS.", "error");
+      lockRevealUI(true, "");
+      currentCredential = null;
+      return null;
+    }
+
+    // Normalize fields
+    const status = (pick(row, ["status","code","result","state"]) || "ok") + "";
+    const ok = !["payment_required","blocked","inactive","denied","unauthorized"].includes(status.toLowerCase());
+    const credEmail = pick(row, ["credential_email","email","login_email","veo_email","username"]);
+    const credPass  = pick(row, ["credential_password","password","login_password","veo_password"]);
+    const cycleStart = pick(row, ["cycle_start","start_date","period_start","billing_start","from"]);
+    const cycleEnd   = pick(row, ["cycle_end","end_date","period_end","billing_end","to"]);
+    const daysRemain = pick(row, ["days_remaining","days_left","remaining_days"]);
+
+    currentCredential = { ok, status, credEmail, credPass, cycleStart, cycleEnd, daysRemain };
+
+    setCredentialUI(credEmail, maskPassword(credPass));
+    setCycleLabels(cycleStart, cycleEnd);
+    setProgress(cycleStart, cycleEnd);
+    if(daysRemain !== null && daysRemain !== undefined){
+      setDaysHeader(daysRemain);
+    }
+
+    if(!ok){
+      lockRevealUI(true, "Mensalidade pendente");
+      return currentCredential;
+    }
+
+    lockRevealUI(false, "");
+    return currentCredential;
+  }
+
+  async function fetchAndRevealPassword(){
+    if(!currentCredential || !currentCredential.credPass){
+      await loadCredential();
+    }
+    if(!currentCredential){
+      toast("Faça login novamente.", "warn");
+      return;
+    }
+    if(!currentCredential.ok){
+      toast("Senha bloqueada. Mensalidade pendente.", "warn");
+      return;
+    }
+    const passEl = document.getElementById("credPass");
+    const btn = document.getElementById("btnReveal");
+    const timer = document.getElementById("revealTimer");
+    if(!passEl || !btn) return;
+
+    const original = passEl.textContent;
+    passEl.textContent = currentCredential.credPass;
+
+    btn.disabled = true;
+    btn.textContent = "Liberado";
+
+    let remaining = 15;
+    if(timer) timer.textContent = `Oculta em ${remaining}s`;
+    const it = setInterval(()=>{
+      remaining -= 1;
+      if(timer) timer.textContent = `Oculta em ${Math.max(0, remaining)}s`;
+      if(remaining <= 0){
+        clearInterval(it);
+        passEl.textContent = maskPassword(currentCredential.credPass);
+        btn.disabled = false;
+        btn.textContent = "Liberar";
+        if(timer) timer.textContent = "";
+      }
+    }, 1000);
+  }
+
+  async function refreshCredentialPreview(){
+    await loadCredential();
+  }
+  // === end FIX ===
+
 function revealPassword(){ fetchAndRevealPassword(); }
 
 function setNav(el) {
