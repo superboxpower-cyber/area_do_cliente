@@ -3,415 +3,575 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>VEO3 Hub</title>
+<title>VEO3 Hub · BoxPower</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #080C14;
-    --surface: #0E1420;
-    --surface2: #131A28;
-    --surface3: #1A2236;
-    --border: rgba(255,255,255,0.07);
-    --border-glow: rgba(99,179,237,0.2);
-    --text: #EEF2FF;
-    --muted: #6B7A99;
-    --accent: #4F8EF7;
-    --accent2: #63B3ED;
-    --green: #34D399;
-    --red: #F87171;
-    --amber: #FBBF24;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    max-width: 430px;
-    margin: 0 auto;
-    overflow-x: hidden;
-    position: relative;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    top: -150px; left: 50%;
-    transform: translateX(-50%);
-    width: 500px; height: 400px;
-    background: radial-gradient(ellipse, rgba(79,142,247,0.12) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* HEADER */
-  header {
-    position: relative; z-index: 10;
-    padding: 22px 18px 14px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo-mark{
-    width: 44px; height: 44px; border-radius: 13px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.10);
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+:root {
+  --bg:        #04070F;
+  --bg2:       #070D1A;
+  --glass:     rgba(255,255,255,0.035);
+  --glass2:    rgba(255,255,255,0.06);
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(99,179,237,0.18);
+  --text:      #F0F4FF;
+  --muted:     #5A6B8A;
+  --muted2:    #8899BB;
+  --blue:      #4F8EF7;
+  --blue2:     #63B3ED;
+  --violet:    #8B5CF6;
+  --cyan:      #06B6D4;
+  --green:     #10B981;
+  --amber:     #F59E0B;
+  --red:       #EF4444;
+  --glow-blue: rgba(79,142,247,0.25);
+  --glow-vio:  rgba(139,92,246,0.2);
 }
-.logo-mark img{
-    width:100%; height:100%;
-    object-fit: cover;
-    display:block;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  position: relative;
 }
-  .header-brand { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
-  .header-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-  
-  .header-hello{
-    font-size:0.75rem;
-    color: rgba(238,242,255,0.75);
-    margin-bottom:4px;
-    letter-spacing:0.04em;
-  }
-.status-pill::before {
-    content: ''; width: 7px; height: 7px;
-    background: var(--green); border-radius: 50%;
-    box-shadow: 0 0 8px var(--green);
-    animation: blink 2.5s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
 
-  /* GREETING */
-  .greeting { position: relative; z-index: 10; padding: 28px 20px 0; }
-  .greeting-hello { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
-  .greeting-name {
-    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
-    letter-spacing: -0.03em; line-height: 1;
-    background: linear-gradient(135deg, #EEF2FF 0%, #93C5FD 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
+/* ── AMBIENT BACKGROUND ── */
+.ambient {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.ambient-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.35;
+}
+.orb1 { width:320px;height:320px;background:radial-gradient(circle,#4F8EF7,transparent); top:-80px;left:-60px; animation: drift1 12s ease-in-out infinite; }
+.orb2 { width:260px;height:260px;background:radial-gradient(circle,#8B5CF6,transparent); top:200px;right:-80px; animation: drift2 15s ease-in-out infinite; }
+.orb3 { width:200px;height:200px;background:radial-gradient(circle,#06B6D4,transparent); bottom:100px;left:20px; animation: drift3 10s ease-in-out infinite; opacity:0.2; }
 
-  /* MAIN */
-  main { position: relative; z-index: 10; padding: 12px 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+@keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,30px)} }
+@keyframes drift3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-20px)} }
 
-  /* CARD */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; position: relative; }
-  @keyframes slideUp { from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)} }
-  .card { animation: slideUp 0.5s ease both; }
+/* grid overlay */
+.ambient::after {
+  content:'';
+  position:absolute;inset:0;
+  background-image: linear-gradient(rgba(79,142,247,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg,rgba(79,142,247,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
 
-  /* MINI STATS */
-  .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .mini-stat {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 16px;
-    animation: slideUp 0.45s ease both;
-  }
-  .mini-stat:nth-child(2) { animation-delay: 0.07s; }
-  .mini-stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 500; }
-  .mini-stat-value { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; line-height: 1; margin-bottom: 2px; }
-  .mini-stat-sub { font-size: 0.7rem; color: var(--muted); }
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  padding: 20px 18px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  background: rgba(4,7,15,0.6);
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
 
-  /* CYCLE CARD */
-  .cycle-card {
-    background: linear-gradient(145deg, #0D1829, #091018);
-    border-color: rgba(79,142,247,0.15);
-    padding: 18px;
-    margin-top: 14px;
-  }
-  .cycle-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,179,237,0.5), transparent);
-  }
-  .cycle-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
-  
-  .cycle-top-left{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap: 12px;
-    width: 100%;
-  }
-  .cycle-hello{
-    font-family:'Inter', sans-serif;
-    font-size: 0.86rem;
-    color: rgba(238,242,255,0.78);
-    white-space: nowrap;
-  }
-  .cycle-hello strong{ color: var(--text); font-weight: 700; }
+.logo-mark {
+  width: 46px; height: 46px; border-radius: 14px;
+  overflow: hidden; position: relative;
+  border: 1px solid rgba(79,142,247,0.3);
+  box-shadow: 0 0 20px rgba(79,142,247,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.logo-mark img { width:100%;height:100%;object-fit:cover;display:block; }
+.logo-mark::after {
+  content:'';position:absolute;inset:0;
+  background: linear-gradient(135deg, rgba(79,142,247,0.15), transparent);
+}
 
-.cycle-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; font-weight: 500; }
-  .cycle-dates { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
-  .cycle-dates span { color: var(--muted); font-weight: 400; }
-  .days-badge {
-    background: rgba(251,191,36,0.1);
-    border: 1px solid rgba(251,191,36,0.2);
-    border-radius: 10px;
-    padding: 7px 12px;
-    text-align: center;
-    margin-top: -6px;
-  }
-  .days-badge .num { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--amber); line-height: 1; display: block; }
-  .days-badge .lbl { font-size: 0.65rem; color: rgba(251,191,36,0.6); text-transform: uppercase; letter-spacing: 0.05em; }
-  .progress-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
-  .progress-track { height: 4px; background: var(--surface3); border-radius: 100px; overflow: hidden; }
-  .progress-fill {
-    height: 100%; width: 27%;
-    background: linear-gradient(90deg, #4F8EF7, #7C3AED);
-    border-radius: 100px; position: relative;
-    box-shadow: 0 0 10px rgba(79,142,247,0.6);
-  }
-  .progress-fill::after {
-    content: ''; position: absolute; right: -3px; top: -2px;
-    width: 8px; height: 8px; background: #fff; border-radius: 50%;
-    box-shadow: 0 0 8px rgba(79,142,247,0.8);
-  }
+.header-info { display: flex; flex-direction: column; }
+.header-hello { font-size: 0.72rem; color: var(--muted2); letter-spacing:0.06em; font-weight:400; }
+.header-brand { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing:-0.01em; }
+.header-sub {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.65rem; color: var(--cyan); font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px;
+}
+.header-sub::before {
+  content:''; width:5px;height:5px;border-radius:50%;
+  background:var(--cyan); box-shadow:0 0 6px var(--cyan);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
 
-  /* CRED CARD */
-  .cred-card { padding: 22px; animation-delay: 0.16s; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .card-header-left { display: flex; align-items: center; gap: 10px; }
-  .card-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--surface3); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
-  }
-  .card-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; }
-  .access-badge {
-    background: var(--surface3); border: 1px solid var(--border);
-    border-radius: 8px; padding: 4px 10px;
-    font-size: 0.7rem; color: var(--muted); font-weight: 500;
-  }
-  .cred-row {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 13px; padding: 14px 16px; margin-bottom: 4px;
-  }
-  .cred-field-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
-  .cred-field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .cred-value { font-size: 0.88rem; font-weight: 500; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cred-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .btn-icon {
-    width: 34px; height: 34px; border-radius: 9px;
-    border: 1px solid var(--border); background: var(--surface3);
-    color: var(--muted); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s; font-size: 0.8rem;
-  }
-  .btn-icon:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
-  .btn-icon:active { transform: scale(0.92); }
-  .btn-reveal {
-    height: 34px; padding: 0 14px; border-radius: 9px; border: none;
-    background: linear-gradient(135deg, #2563EB, #7C3AED); color: #fff;
-    font-size: 0.75rem; font-weight: 600; cursor: pointer;
-    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.35); white-space: nowrap;
-    font-family: 'Inter', sans-serif;
-  }
-  .btn-reveal:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
-  .btn-reveal:active { transform: scale(0.95); }
-  .cred-hint {
-    margin-top: 12px; padding: 10px 14px;
-    background: rgba(79,142,247,0.05); border: 1px solid rgba(79,142,247,0.1);
-    border-radius: 10px; font-size: 0.72rem; color: var(--muted); line-height: 1.55;
-  }
-  .cred-hint strong { color: var(--accent2); font-weight: 600; }
-  .cred-bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-  .btn-action {
-    height: 42px; border-radius: 12px; border: 1px solid var(--border);
-    background: var(--surface2); color: var(--text); font-size: 0.78rem; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    gap: 7px; transition: all 0.2s; font-family: 'Inter', sans-serif;
-  }
-  .btn-action:hover { border-color: rgba(79,142,247,0.3); color: var(--accent2); }
-  .btn-action:active { transform: scale(0.97); }
-  .btn-action.danger { color: var(--red); border-color: rgba(248,113,113,0.15); background: rgba(248,113,113,0.04); }
-  .btn-action.danger:hover { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
-  .dots { letter-spacing: 3px; font-size: 0.75rem; color: var(--muted); }
+.header-actions { display: flex; gap: 8px; }
 
-  /* MESSAGES CARD */
-  .msg-card { padding: 20px 22px; animation-delay: 0.22s; }
-  .msg-item:hover { background: var(--surface2); }
-  .msg-text strong { color: var(--text); font-weight: 600; }
+.hbtn {
+  width: 38px; height: 38px; border-radius: 11px;
+  border: 1px solid var(--border); background: var(--glass2);
+  color: var(--muted2); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
+  font-size: 0; /* hide text, show svg */
+}
+.hbtn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.hbtn:hover { border-color: var(--blue2); color: var(--blue2); background: rgba(79,142,247,0.1); box-shadow: 0 0 12px rgba(79,142,247,0.15); }
+.hbtn:active { transform: scale(0.9); }
+.hbtn.spin svg { animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  /* BOTTOM NAV */
-  .nav-item:hover { background: var(--surface3); }
-  .nav-item.active .nav-icon, .nav-item.active /* TOAST */
-  .toast {
-    position: fixed; bottom: 108px; left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: var(--surface); border: 1px solid rgba(52,211,153,0.3);
-    border-radius: 12px; padding: 10px 20px;
-    font-size: 0.8rem; color: var(--green); font-weight: 500;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    opacity: 0; transition: all 0.3s ease; pointer-events: none; white-space: nowrap; z-index: 200;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* ── MAIN ── */
+main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; flex-direction: column; gap: 14px; }
 
-  /* TIMER */
-  .reveal-timer {
-    display: none; font-size: 0.7rem; color: var(--accent);
-    font-weight: 600; font-family: 'Syne', sans-serif;
-    background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.2);
-    border-radius: 6px; padding: 2px 7px;
-  }
+/* ── CARD BASE ── */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  backdrop-filter: blur(24px);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+}
 
-  /* ADMIN BANNER (rotativo) */
-  .banner-wrap{ margin-top: 6px; display:grid; gap: 10px; }
-  .banner{
-    display:flex;
-    gap: 12px;
-    align-items:flex-start;
-    padding: 14px 14px;
-    border-radius: 18px;
-    background: rgba(0,0,0,0.16);
-    border: 1px solid rgba(255,255,255,0.08);
-    overflow:hidden;
-    position:relative;
-  }
-  .banner-emoji{
-    width: 38px; height: 38px;
-    border-radius: 14px;
-    display:flex; align-items:center; justify-content:center;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.10);
-    flex: 0 0 auto;
-    font-size: 1.1rem;
-  }
-  .banner-text{
-    font-size: 0.88rem;
-    line-height: 1.35;
-    color: rgba(238,242,255,0.86);
-  }
-  .banner-text strong{ color: var(--text); font-weight: 700; }
-  .banner.out{
-    animation: bannerOut .32s ease forwards;
-  }
-  .banner.in{
-    animation: bannerIn .36s ease forwards;
-  }
-  @keyframes bannerOut{
-    from{ opacity:1; transform: translateY(0); }
-    to{ opacity:0; transform: translateY(-8px); }
-  }
-  @keyframes bannerIn{
-    from{ opacity:0; transform: translateY(10px); }
-    to{ opacity:1; transform: translateY(0); }
-  }
-  .banner-dots{
-    display:flex;
-    justify-content:center;
-    gap: 8px;
-    padding-bottom: 2px;
-    opacity:.85;
-  }
-  .banner-dots span{
-    width: 6px; height: 6px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.24);
-  }
-  .banner-dots span.on{
-    background: rgba(99,179,237,0.95);
-    box-shadow: 0 0 0 6px rgba(99,179,237,0.12);
-  }
+/* ── CYCLE CARD ── */
+.cycle-card { padding: 20px; }
+.cycle-card::after {
+  content: '';
+  position: absolute; bottom: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.15), transparent);
+  pointer-events: none;
+}
 
+.cycle-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.cycle-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--blue2); margin-bottom: 6px;
+}
+.cycle-tag svg { width:10px;height:10px;stroke:var(--cyan);fill:none;stroke-width:2.5; }
+.cycle-dates { font-family: 'DM Mono', monospace; font-size: 1rem; font-weight: 500; color: var(--text); }
+.cycle-arrow { color: var(--muted); margin: 0 6px; }
+
+/* DIAS BADGE — radial gauge */
+.gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+.gauge {
+  position: relative; width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+}
+.gauge svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.gauge-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 4; }
+.gauge-fill {
+  fill: none; stroke-width: 4; stroke-linecap: round;
+  stroke: url(#gaugeGrad);
+  stroke-dasharray: 188; stroke-dashoffset: 50;
+  transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+}
+.gauge-num { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--amber); line-height: 1; }
+.gauge-lbl { font-size: 0.6rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; font-weight:500; }
+
+/* PROGRESS */
+.progress-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; font-family: 'DM Mono', monospace; }
+.progress-track {
+  height: 6px; background: rgba(255,255,255,0.05);
+  border-radius: 100px; overflow: visible; position: relative;
+}
+.progress-fill {
+  height: 100%; width: 27%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--blue), var(--violet));
+  position: relative;
+  box-shadow: 0 0 12px rgba(79,142,247,0.5);
+  transition: width 1.4s cubic-bezier(.4,0,.2,1);
+}
+.progress-fill::after {
+  content: ''; position: absolute; right: -5px; top: -4px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.3), 0 0 12px rgba(79,142,247,0.8);
+}
+.progress-pct {
+  position: absolute; right: 0; top: -22px;
+  font-size: 0.65rem; color: var(--blue2); font-family: 'DM Mono', monospace; font-weight: 500;
+}
+
+/* MINI STATS ROW */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 16px; }
+.stat-chip {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 12px 10px;
+  text-align: center;
+}
+.stat-chip-icon { font-size: 1rem; margin-bottom: 4px; }
+.stat-chip-val { font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; line-height: 1; }
+.stat-chip-lbl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+/* ── CREDENTIAL CARD ── */
+.cred-card { padding: 20px; }
+
+.cred-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+}
+.cred-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(139,92,246,0.2));
+  border: 1px solid rgba(79,142,247,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  box-shadow: 0 0 16px rgba(79,142,247,0.1);
+}
+.cred-title { font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; }
+.cred-subtitle { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+
+.cred-status {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--green); text-transform: uppercase;
+  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 20px; padding: 4px 10px;
+}
+.cred-status::before {
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 6px var(--green);
+  animation:blink 2s ease-in-out infinite;
+}
+
+/* FIELD */
+.cred-field {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.cred-field:hover { border-color: rgba(79,142,247,0.2); }
+.cred-field-label {
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px; font-weight: 600;
+  display: flex; align-items: center; gap: 5px;
+}
+.cred-field-label svg { width:9px;height:9px;stroke:var(--muted);fill:none;stroke-width:2.5; }
+.cred-field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cred-val {
+  font-family: 'DM Mono', monospace; font-size: 0.85rem;
+  font-weight: 500; color: var(--text); flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dots-anim { letter-spacing: 5px; font-size: 0.6rem; color: var(--muted); }
+
+.field-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.ibtn {
+  width: 32px; height: 32px; border-radius: 9px;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+  color: var(--muted); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.ibtn svg { width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.ibtn:hover { border-color: var(--blue2); color: var(--blue2); background: rgba(79,142,247,0.08); }
+.ibtn:active { transform: scale(0.88); }
+
+.reveal-timer {
+  display: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; color: var(--amber); font-weight: 500;
+  background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 6px; padding: 3px 8px;
+}
+
+.btn-reveal {
+  height: 32px; padding: 0 14px; border-radius: 9px; border: none;
+  background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+  color: #fff; font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.2s; white-space: nowrap; font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.02em;
+}
+.btn-reveal svg { width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5; }
+.btn-reveal:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(37,99,235,0.5); }
+.btn-reveal:active { transform: scale(0.95); }
+
+/* ── MESSAGES CARD ── */
+.msg-card { padding: 20px; }
+.msg-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.msg-title-wrap { display: flex; align-items: center; gap: 10px; }
+.msg-icon {
+  width: 36px; height: 36px; border-radius: 11px;
+  background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.msg-icon svg { width:16px;height:16px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.msg-count {
+  font-size: 0.65rem; color: var(--muted); font-family: 'DM Mono', monospace;
+  background: var(--glass2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 2px 9px;
+}
+
+.banner {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border-radius: 16px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.banner::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background: linear-gradient(180deg, var(--blue), var(--violet));
+  border-radius: 3px 0 0 3px;
+}
+.banner-emoji-wrap {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.banner-body { flex: 1; }
+.banner-text { font-size: 0.85rem; line-height: 1.45; color: rgba(240,244,255,0.85); }
+.banner-text strong { color: var(--text); font-weight: 700; }
+
+.banner.out { animation: bOut .3s ease forwards; }
+.banner.in  { animation: bIn .35s ease forwards; }
+@keyframes bOut { from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-12px)} }
+@keyframes bIn  { from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)} }
+
+.banner-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.banner-dots span {
+  height: 3px; border-radius: 3px; background: rgba(255,255,255,0.15);
+  transition: all 0.35s ease;
+  width: 16px;
+}
+.banner-dots span.on {
+  background: var(--blue); width: 28px;
+  box-shadow: 0 0 8px rgba(79,142,247,0.5);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(10,16,30,0.95);
+  border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 14px; padding: 10px 20px;
+  font-size: 0.78rem; color: var(--green); font-weight: 600;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  opacity: 0; transition: all 0.35s cubic-bezier(.4,0,.2,1);
+  pointer-events: none; white-space: nowrap; z-index: 300;
+  backdrop-filter: blur(20px);
+  display: flex; align-items: center; gap: 8px;
+}
+.toast::before { content:''; width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0; }
+.toast.warn { color: var(--amber); border-color: rgba(245,158,11,0.25); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── LOGIN SCREEN ── */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+}
+#loginScreen::before {
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(79,142,247,0.12), transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.1), transparent 50%);
+}
+
+.login-box {
+  position: relative; z-index: 1;
+  width: 90%; max-width: 360px;
+  background: rgba(10,15,28,0.9);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 26px; padding: 38px 28px 32px;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(79,142,247,0.08);
+  backdrop-filter: blur(30px);
+  animation: popIn 0.5s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes popIn { from{opacity:0;transform:scale(0.94) translateY(12px)}to{opacity:1;transform:none} }
+
+.login-logo {
+  width: 80px; height: 80px; border-radius: 22px;
+  overflow: hidden; margin: 0 auto 18px;
+  border: 1px solid rgba(79,142,247,0.3);
+  box-shadow: 0 0 30px rgba(79,142,247,0.2);
+}
+.login-logo img { width:100%;height:100%;object-fit:cover;display:block; }
+
+.login-title { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.login-sub { font-size: 0.8rem; color: var(--muted2); margin-bottom: 28px; }
+
+.field-wrap { position: relative; margin-bottom: 10px; text-align: left; }
+.field-wrap input {
+  width: 100%; height: 48px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 13px; color: var(--text);
+  padding: 0 44px 0 46px; font-size: 0.88rem;
+  font-family: 'Outfit', sans-serif; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-wrap input::placeholder { color: var(--muted); }
+.field-wrap input:focus {
+  border-color: rgba(79,142,247,0.4);
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+}
+.field-icon {
+  position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); pointer-events: none;
+}
+.field-icon svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.eye-btn {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); transition: color 0.2s; padding: 4px;
+  display: flex; align-items: center;
+}
+.eye-btn svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+.eye-btn:hover { color: var(--text); }
+
+.remember-row {
+  display: flex; align-items: center; gap: 8px;
+  margin: 12px 0 18px; text-align: left;
+}
+.remember-row input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0;
+}
+.remember-row label { font-size: 0.8rem; color: var(--muted2); cursor: pointer; user-select: none; }
+
+.btn-login {
+  width: 100%; height: 48px; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: #fff; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  letter-spacing: 0.04em; font-family: 'Outfit', sans-serif;
+  box-shadow: 0 6px 24px rgba(37,99,235,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.btn-login::after {
+  content:'';position:absolute;inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.btn-login:hover::after { opacity:1; }
+.btn-login:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(37,99,235,0.5); }
+.btn-login:active { transform: scale(0.98); }
+
+#loginMsg {
+  margin-top: 12px; font-size: 0.8rem;
+  color: rgba(240,244,255,0.6); line-height: 1.4;
+}
+#loginMsg.err { color: var(--red); }
+
+/* ── ANIMATIONS ── */
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none} }
+.card { animation: slideUp 0.5s ease both; }
+.cycle-card { animation-delay: 0.05s; }
+.cred-card  { animation-delay: 0.12s; }
+.msg-card   { animation-delay: 0.19s; }
 </style>
 </head>
 <body>
 
-<div id="loginScreen" style="
-  position:fixed;
-  inset:0;
-  background:#080C14;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-">
-  <div style="
-    width:90%;
-    max-width:380px;
-    background:#0E1420;
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:22px;
-    padding:40px 28px;
-    text-align:center;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
-  ">
-    <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg"
-         style="width:90px;height:90px;border-radius:20px;margin-bottom:20px;object-fit:cover;">
-    <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;margin-bottom:6px;">BoxPower</h2>
-    <p style="color:#6B7A99;font-size:0.85rem;margin-bottom:30px;">Acesso do Cliente</p>
+<!-- AMBIENT -->
+<div class="ambient">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
 
-    
-    <input type="email" id="loginEmail" placeholder="Digite seu e-mail"
-      style="
-        width:100%;
-        height:46px;
-        border-radius:12px;
-        border:1px solid rgba(255,255,255,0.1);
-        background:#131A28;
-        color:#EEF2FF;
-        padding:0 14px;
-        margin-bottom:12px;
-        font-size:0.9rem;
-      ">
-<input type="password" id="loginPass" placeholder="Digite sua senha"
-      style="
-        width:100%;
-        height:46px;
-        border-radius:12px;
-        border:1px solid rgba(255,255,255,0.1);
-        background:#131A28;
-        color:#EEF2FF;
-        padding:0 14px;
-        margin-bottom:18px;
-        font-size:0.9rem;
-      ">
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" alt="BoxPower">
+    </div>
+    <div class="login-title">BoxPower</div>
+    <div class="login-sub">Portal exclusivo de clientes</div>
 
-    <button onclick="login()"
-      style="
-        width:100%;
-        height:46px;
-        border:none;
-        border-radius:14px;
-        background:linear-gradient(135deg,#2563EB,#7C3AED);
-        color:#fff;
-        font-weight:600;
-        font-size:0.9rem;
-        cursor:pointer;
-      ">
-      ENTRAR
-    </button>
-    <div id="loginMsg" style="margin-top:12px;color:rgba(238,242,255,0.70);font-size:0.85rem;line-height:1.35;"></div>
+    <div class="field-wrap">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+    </div>
+
+    <div class="field-wrap">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password">
+      <button class="eye-btn" id="eyeBtn" onclick="togglePass()" title="Ver senha">
+        <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <div class="remember-row">
+      <input type="checkbox" id="rememberMe">
+      <label for="rememberMe">Lembrar minha senha</label>
+    </div>
+
+    <button class="btn-login" onclick="login()">ENTRAR</button>
+    <div id="loginMsg"></div>
   </div>
 </div>
 
-
+<!-- HEADER -->
 <header>
   <div class="header-left">
-    <div class="logo-mark"><img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" alt="BoxPower"></div>
-    <div>
-      <div class="header-hello">Olá, Tulio 👋</div>
+    <div class="logo-mark">
+      <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" alt="BoxPower">
+    </div>
+    <div class="header-info">
+      <div class="header-hello" id="headerHello">Olá, Tulio 👋</div>
       <div class="header-brand">BoxPower</div>
       <div class="header-sub">VEO3 Shared</div>
     </div>
   </div>
-<div class="card cycle-card">
-    <div class="cycle-top">
-      <div class="cycle-top-left">
-        </header>
+  <div class="header-actions">
+    <button class="hbtn" id="refreshBtn" onclick="refreshPortal()" title="Atualizar">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+    </button>
+  </div>
+</header>
 
 <main>
 
-  </div>
-      <div class="days-badge">
-        <span class="num">22</span>
-        <span class="lbl">dias</span>
+  <!-- CICLO CARD -->
+  <div class="card cycle-card">
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#4F8EF7"/>
+          <stop offset="100%" stop-color="#8B5CF6"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="cycle-top">
+      <div>
+        <div class="cycle-dates">
+          <span style="font-family:'DM Mono',monospace">15/02</span>
+          <span class="cycle-arrow">→</span>
+          <span style="font-family:'DM Mono',monospace">15/03</span>
+        </div>
+      </div>
+
+      <div class="gauge-wrap">
+        <div class="gauge">
+          <svg viewBox="0 0 72 72">
+            <circle class="gauge-track" cx="36" cy="36" r="30"/>
+            <circle class="gauge-fill" cx="36" cy="36" r="30"/>
+          </svg>
+          <div class="gauge-num">22</div>
+        </div>
+        <div class="gauge-lbl">dias rest.</div>
       </div>
     </div>
-    <div>
-      <div class="progress-row">
-        <span>Início: 15/02</span>
-        <span>Fim: 15/03</span>
+
+    <div style="position:relative;">
+      <div class="progress-labels">
+        <span>15 FEV</span>
+        <span>15 MAR</span>
       </div>
       <div class="progress-track">
         <div class="progress-fill"></div>
@@ -419,362 +579,290 @@
     </div>
   </div>
 
-  <!-- CREDENTIALS -->
+  <!-- CREDENTIALS CARD -->
   <div class="card cred-card">
-    <div class="card-header">
-      <div class="card-header-left">
-        <div class="card-icon">🔐</div>
-        <div class="card-title">Credenciais do VEO3 ilimitado</div>
+    <div class="cred-header">
+      <div class="cred-icon">🔐</div>
+      <div>
+        <div class="cred-title">Credenciais VEO3</div>
+        <div class="cred-subtitle">Acesso ilimitado compartilhado</div>
       </div>
-      
+      <div class="cred-status">Ativo</div>
     </div>
 
-    <div class="cred-row">
-      <div class="cred-field-label">Email</div>
+    <!-- EMAIL -->
+    <div class="cred-field">
+      <div class="cred-field-label">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        E-mail de acesso
+      </div>
       <div class="cred-field-row">
-        <div class="cred-value" id="email-val">tuliofelipexk@gmail.com</div>
-        <div class="cred-actions">
-          <button class="btn-icon" onclick="copyText('email-val','Email copiado!')" title="Copiar">⧉</button>
+        <div class="cred-val" id="email-val">—</div>
+        <div class="field-actions">
+          <button class="ibtn" onclick="copyText('email-val','Email copiado!')" title="Copiar email">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="cred-row">
-      <div class="cred-field-label">Senha</div>
+    <!-- SENHA -->
+    <div class="cred-field">
+      <div class="cred-field-label">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Senha de acesso
+      </div>
       <div class="cred-field-row">
-        <div class="cred-value">
-          <span class="dots" id="dots-view">• • • • • • • • • •</span>
-          <span id="pass-val" style="display:none;">Minha@Senha123</span>
+        <div class="cred-val">
+          <span class="dots-anim" id="dots-view">• • • • • • • • •</span>
+          <span id="pass-val" style="display:none;"></span>
         </div>
-        <div class="cred-actions">
+        <div class="field-actions">
           <span class="reveal-timer" id="timer-lbl"></span>
-          <button class="btn-icon" id="copy-pass" onclick="copyText('pass-val','Senha copiada!')" style="display:none;" title="Copiar">⧉</button>
-          <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()">👁 Liberar</button>
+          <button class="ibtn" id="copy-pass" onclick="copyText('pass-val','Senha copiada!')" style="display:none;" title="Copiar senha">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Liberar
+          </button>
         </div>
       </div>
     </div>
-
-    
-
-    
   </div>
 
-  <!-- MESSAGES -->
+  <!-- MESSAGES CARD -->
   <div class="card msg-card">
-    <div class="card-header">
-      <div class="card-header-left">
-        <div class="card-icon">📋</div>
-        <div class="card-title">Mensagens da Administração</div>
+    <div class="msg-header">
+      <div class="msg-title-wrap">
+        <div class="msg-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:700;">Administração</div>
+          <div style="font-size:0.65rem;color:var(--muted);">Avisos e atualizações</div>
+        </div>
       </div>
-    </div>
-    
-    <div class="banner-wrap">
-      <div class="banner" id="adminBanner">
-        <div class="banner-emoji" id="bannerEmoji">📌</div>
-        <div class="banner-text" id="bannerText"><strong>Atualização.</strong> O portal está em constante evolução.</div>
-      </div>
-      <div class="banner-dots" id="bannerDots" aria-hidden="true"></div>
+      <div class="msg-count" id="msgCount">— msgs</div>
     </div>
 
+    <div class="banner" id="adminBanner">
+      <div class="banner-emoji-wrap" id="bannerEmoji">⏳</div>
+      <div class="banner-body">
+        <div class="banner-text" id="bannerText">Carregando mensagens...</div>
+      </div>
+    </div>
+    <div class="banner-dots" id="bannerDots"></div>
   </div>
 
 </main>
 
-
-
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = "https://epwmoicgvuprzkcpxjoy.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
+const SUPABASE_URL     = "https://epwmoicgvuprzkcpxjoy.supabase.co";
+const SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwd21vaWNndnVwcnprY3B4am95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDAxMjgsImV4cCI6MjA4NTMxNjEyOH0.pXcCWqGQSS6YMIZeIyfAaGlNaW6Mx2hfDQtVrX4zues";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/* ── OLHINHO ── */
+let passVisible = false;
+function togglePass() {
+  const input = document.getElementById('loginPass');
+  passVisible = !passVisible;
+  input.type = passVisible ? 'text' : 'password';
+  document.getElementById('eyeIcon').innerHTML = passVisible
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+/* ── LEMBRAR SENHA ── */
+(function loadSaved() {
+  try {
+    const s = localStorage.getItem('bp_creds');
+    if (!s) return;
+    const { e, p } = JSON.parse(s);
+    document.getElementById('loginEmail').value = e || '';
+    document.getElementById('loginPass').value  = p || '';
+    document.getElementById('rememberMe').checked = true;
+  } catch(_) {}
+})();
+
+/* ── MENSAGENS SUPABASE ── */
+let msgs = [], msgIdx = 0, msgTimer = null;
+
+async function loadMessages() {
+  try {
+    const { data } = await sb.from('admin_messages').select('emoji,message').eq('active', true).order('order');
+    msgs = (data && data.length)
+      ? data.map(r => ({ emoji: r.emoji || '📌', html: r.message }))
+      : [
+          { emoji:'📌', html:'<strong>Bem-vindo.</strong> Portal VEO3 ativo.' },
+          { emoji:'💡', html:'<strong>Dica.</strong> Copie a senha com um clique.' },
+          { emoji:'🛡️', html:'<strong>Segurança.</strong> Senha expira em 15s.' }
+        ];
+  } catch(_) {
+    msgs = [{ emoji:'📌', html:'<strong>Portal VEO3.</strong> Bem-vindo.' }];
+  }
+  document.getElementById('msgCount').textContent = msgs.length + (msgs.length === 1 ? ' msg' : ' msgs');
+  initBanner();
+}
+
+function initBanner() {
+  if (msgTimer) clearInterval(msgTimer);
+  msgIdx = 0;
+  const banner = document.getElementById('adminBanner');
+  const emojiEl = document.getElementById('bannerEmoji');
+  const textEl  = document.getElementById('bannerText');
+  const dotsEl  = document.getElementById('bannerDots');
+  if (!banner) return;
+
+  dotsEl.innerHTML = msgs.map((_,i) => `<span class="${i===0?'on':''}"></span>`).join('');
+  const dots = [...dotsEl.querySelectorAll('span')];
+
+  function render(i) {
+    emojiEl.textContent = msgs[i].emoji;
+    textEl.innerHTML    = msgs[i].html;
+    dots.forEach((d,k) => d.classList.toggle('on', k===i));
+  }
+  function next() {
+    banner.classList.remove('in'); banner.classList.add('out');
+    setTimeout(() => {
+      msgIdx = (msgIdx + 1) % msgs.length;
+      render(msgIdx);
+      banner.classList.remove('out'); banner.classList.add('in');
+    }, 320);
+  }
+  render(0); banner.classList.add('in');
+  if (msgs.length > 1) msgTimer = setInterval(next, 4500);
+}
+
+/* ── REFRESH ── */
+async function refreshPortal() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spin');
+  await loadMessages();
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data } = await sb.rpc('reveal_veo3_password');
+      if (data?.veo_email) setEl('email-val', data.veo_email);
+    }
+  } catch(_) {}
+  setTimeout(() => { btn.classList.remove('spin'); showToast('Portal atualizado!'); }, 700);
+}
+
+/* ── REVEAL PASSWORD ── */
+let revealTimer = null, countTimer = null;
+
+async function revealPassword() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { toast('Faça login para liberar a senha.', 'warn'); return; }
+
+    const { data, error } = await sb.rpc('reveal_veo3_password');
+    if (error) {
+      const m = (error.message || '').toLowerCase();
+      toast(m.includes('payment') ? 'Senha bloqueada: mensalidade pendente.' :
+            m.includes('not_allowed') ? 'Email não autorizado.' :
+            'Não foi possível liberar. Tente novamente.', 'warn');
+      return;
+    }
+
+    if (data?.veo_email) setEl('email-val', data.veo_email);
+
+    if (data?.veo_password) {
+      setEl('pass-val', data.veo_password);
+      document.getElementById('pass-val').style.display = 'inline';
+      document.getElementById('dots-view').style.display = 'none';
+
+      const cp = document.getElementById('copy-pass');
+      const rb = document.getElementById('reveal-btn');
+      const tl = document.getElementById('timer-lbl');
+
+      if (cp) cp.style.display = 'inline-flex';
+      if (rb) rb.style.display = 'none';
+      if (tl) tl.style.display = 'inline';
+
+      let secs = 15;
+      tl.textContent = secs + 's';
+      if (countTimer) clearInterval(countTimer);
+      countTimer = setInterval(() => {
+        secs--;
+        tl.textContent = secs + 's';
+        if (secs <= 0) clearInterval(countTimer);
+      }, 1000);
+
+      if (revealTimer) clearTimeout(revealTimer);
+      revealTimer = setTimeout(() => {
+        document.getElementById('pass-val').style.display = 'none';
+        document.getElementById('dots-view').style.display = 'inline';
+        if (cp) cp.style.display = 'none';
+        if (rb) rb.style.display = 'inline-flex';
+        if (tl) tl.style.display = 'none';
+      }, 15000);
+    }
+  } catch(e) { toast('Erro ao liberar senha.', 'warn'); }
+}
+
+/* ── LOGIN ── */
+async function login() {
+  const email = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+  const pass  = (document.getElementById('loginPass').value || '');
+  const msgEl = document.getElementById('loginMsg');
+  msgEl.textContent = ''; msgEl.className = '';
+
+  if (!email || !pass) { msgEl.textContent = 'Preencha e-mail e senha.'; msgEl.className = 'err'; return; }
+
+  if (document.getElementById('rememberMe').checked) {
+    localStorage.setItem('bp_creds', JSON.stringify({ e: email, p: pass }));
+  } else {
+    localStorage.removeItem('bp_creds');
+  }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    msgEl.textContent = 'Login inválido. Verifique seus dados.';
+    msgEl.className = 'err'; return;
+  }
+
+  try { await sb.rpc('link_portal_user'); } catch(_) {}
+
+  const nome = email.split('@')[0];
+  const nomeF = nome.charAt(0).toUpperCase() + nome.slice(1);
+  setEl('headerHello', 'Olá, ' + nomeF + ' 👋');
+  document.getElementById('loginScreen').style.display = 'none';
+  showToast('Bem-vindo, ' + nomeF + '!');
+  await loadMessages();
+}
+
+/* ── UTILS ── */
 function copyText(id, msg) {
   const el = document.getElementById(id);
   if (!el) return;
-  const text = el.textContent.trim();
-  navigator.clipboard.writeText(text).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
+  const txt = el.textContent.trim();
+  navigator.clipboard.writeText(txt).catch(() => {
+    const t = document.createElement('textarea');
+    t.value = txt; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t);
   });
-  showToast('✓ ' + msg);
+  showToast(msg);
 }
 
-function showToast(msg) {
+function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  t.textContent = msg;
+  t.className = 'toast' + (type === 'warn' ? ' warn' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-let revealTimeout = null;
+function toast(msg, type) { showToast(msg, type); }
 
-  // === Credential loading / reveal logic (FIX) ===
-  let currentCredential = null;
-
-  function normalizeRpcRow(d){
-    if(!d) return null;
-    if(Array.isArray(d)) return d[0] || null;
-    // Some RPCs return { data: [...] } shapes (rare)
-    if(d.data && Array.isArray(d.data)) return d.data[0] || null;
-    return d;
-  }
-
-  function pick(obj, keys){
-    for(const k of keys){
-      if(obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
-    }
-    return null;
-  }
-
-  function fmtDDMM(dateLike){
-    if(!dateLike) return "—";
-    const dt = new Date(dateLike);
-    if(isNaN(dt.getTime())) return "—";
-    const dd = String(dt.getDate()).padStart(2,"0");
-    const mm = String(dt.getMonth()+1).padStart(2,"0");
-    return `${dd}/${mm}`;
-  }
-
-  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
-
-  function setDaysHeader(days){
-    const numEl = document.querySelector(".days-badge .num");
-    const lblEl = document.querySelector(".days-badge .lbl");
-    if(numEl) numEl.textContent = (days ?? "—");
-    if(lblEl) lblEl.textContent = "DIAS";
-  }
-
-  function setCycleLabels(start, end){
-    const spans = document.querySelectorAll(".progress-row span");
-    if(spans && spans.length >= 2){
-      spans[0].textContent = `Início: ${fmtDDMM(start)}`;
-      spans[spans.length-1].textContent = `Fim: ${fmtDDMM(end)}`;
-    }
-  }
-
-  function setProgress(start, end){
-    const fill = document.querySelector(".progress-fill");
-    if(!fill) return;
-    const s = start ? new Date(start).getTime() : NaN;
-    const e = end ? new Date(end).getTime() : NaN;
-    const now = Date.now();
-    let pct = 0;
-    if(!isNaN(s) && !isNaN(e) && e > s){
-      pct = clamp01((now - s) / (e - s));
-    }
-    fill.style.width = `${Math.round(pct*100)}%`;
-  }
-
-  function setCredentialUI(email, passwordMasked){
-    const emailEl = document.getElementById("credEmail");
-    const passEl = document.getElementById("credPass");
-    if(emailEl) emailEl.textContent = email || "—";
-    if(passEl) passEl.textContent = passwordMasked || "••••••••••";
-  }
-
-  function maskPassword(pwd){
-    if(!pwd) return "••••••••••";
-    const n = Math.max(10, Math.min(14, pwd.length));
-    return "•".repeat(n);
-  }
-
-  function lockRevealUI(locked, message){
-    const btn = document.getElementById("btnReveal");
-    const helper = document.getElementById("revealTimer");
-    if(btn){
-      btn.disabled = !!locked;
-      btn.classList.toggle("disabled", !!locked);
-      btn.textContent = locked ? "Bloqueado" : "Liberar";
-    }
-    if(helper){
-      helper.textContent = message || "";
-    }
-  }
-
-  async function loadCredential(){
-    // Requires logged session
-    const { data: { user } } = await sb.auth.getUser();
-    if(!user){
-      lockRevealUI(true, "");
-      currentCredential = null;
-      return null;
-    }
-
-    let row = null;
-    try{
-      const { data, error } = await sb.rpc("get_veo3_credential");
-      if(error) throw error;
-      row = normalizeRpcRow(data);
-    }catch(e){
-      console.error("RPC get_veo3_credential error:", e);
-      toast("Erro ao carregar credenciais. Verifique a RPC e RLS.", "error");
-      lockRevealUI(true, "");
-      currentCredential = null;
-      return null;
-    }
-
-    // Normalize fields
-    const status = (pick(row, ["status","code","result","state"]) || "ok") + "";
-    const ok = !["payment_required","blocked","inactive","denied","unauthorized"].includes(status.toLowerCase());
-    const credEmail = pick(row, ["credential_email","email","login_email","veo_email","username"]);
-    const credPass  = pick(row, ["credential_password","password","login_password","veo_password"]);
-    const cycleStart = pick(row, ["cycle_start","start_date","period_start","billing_start","from"]);
-    const cycleEnd   = pick(row, ["cycle_end","end_date","period_end","billing_end","to"]);
-    const daysRemain = pick(row, ["days_remaining","days_left","remaining_days"]);
-
-    currentCredential = { ok, status, credEmail, credPass, cycleStart, cycleEnd, daysRemain };
-
-    setCredentialUI(credEmail, maskPassword(credPass));
-    setCycleLabels(cycleStart, cycleEnd);
-    setProgress(cycleStart, cycleEnd);
-    if(daysRemain !== null && daysRemain !== undefined){
-      setDaysHeader(daysRemain);
-    }
-
-    if(!ok){
-      lockRevealUI(true, "Mensalidade pendente");
-      return currentCredential;
-    }
-
-    lockRevealUI(false, "");
-    return currentCredential;
-  }
-
-  async function fetchAndRevealPassword(){
-    if(!currentCredential || !currentCredential.credPass){
-      await loadCredential();
-    }
-    if(!currentCredential){
-      toast("Faça login novamente.", "warn");
-      return;
-    }
-    if(!currentCredential.ok){
-      toast("Senha bloqueada. Mensalidade pendente.", "warn");
-      return;
-    }
-    const passEl = document.getElementById("credPass");
-    const btn = document.getElementById("btnReveal");
-    const timer = document.getElementById("revealTimer");
-    if(!passEl || !btn) return;
-
-    const original = passEl.textContent;
-    passEl.textContent = currentCredential.credPass;
-
-    btn.disabled = true;
-    btn.textContent = "Liberado";
-
-    let remaining = 15;
-    if(timer) timer.textContent = `Oculta em ${remaining}s`;
-    const it = setInterval(()=>{
-      remaining -= 1;
-      if(timer) timer.textContent = `Oculta em ${Math.max(0, remaining)}s`;
-      if(remaining <= 0){
-        clearInterval(it);
-        passEl.textContent = maskPassword(currentCredential.credPass);
-        btn.disabled = false;
-        btn.textContent = "Liberar";
-        if(timer) timer.textContent = "";
-      }
-    }, 1000);
-  }
-
-  async function refreshCredentialPreview(){
-    await loadCredential();
-  }
-  // === end FIX ===
-
-function revealPassword(){ fetchAndRevealPassword(); }
-
-function setNav(el) {
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
+function setEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
 }
 
-
-(function(){
-  const inlineEl = document.getElementById('clientNameInline');
-  if(inlineEl){ inlineEl.textContent = "Tulio"; }
-})();
-
-
-/* Banner rotativo - Mensagens da Administração */
-const adminMessages = [
-  { emoji: "📌", html: "<strong>Atualização.</strong> O portal está em constante evolução. Em breve teremos tutoriais e histórico." },
-  { emoji: "💡", html: "<strong>Dica.</strong> Copie a senha com um clique para agilizar o login no VEO3." },
-  { emoji: "🛡️", html: "<strong>Segurança.</strong> A senha fica oculta por padrão e libera por tempo limitado." }
-];
-
-(function initAdminBanner(){
-  const banner = document.getElementById("adminBanner");
-  const emojiEl = document.getElementById("bannerEmoji");
-  const textEl = document.getElementById("bannerText");
-  const dotsEl = document.getElementById("bannerDots");
-  if(!banner || !emojiEl || !textEl || !dotsEl) return;
-
-  let i = 0;
-  dotsEl.innerHTML = adminMessages.map((_,k)=>`<span class="${k===0?'on':''}"></span>`).join("");
-  const dots = Array.from(dotsEl.querySelectorAll("span"));
-
-  function render(idx){
-    const m = adminMessages[idx];
-    emojiEl.textContent = m.emoji;
-    textEl.innerHTML = m.html;
-    dots.forEach((d,k)=> d.classList.toggle("on", k===idx));
-  }
-
-  function next(){
-    banner.classList.remove("in");
-    banner.classList.add("out");
-    setTimeout(()=>{
-      i = (i+1) % adminMessages.length;
-      render(i);
-      banner.classList.remove("out");
-      banner.classList.add("in");
-    }, 320);
-  }
-
-  render(i);
-  banner.classList.add("in");
-  setInterval(next, 4200);
-})();
-
-
-
-async function login(){
-  const email = (document.getElementById("loginEmail")?.value || "").trim().toLowerCase();
-  const pass  = (document.getElementById("loginPass")?.value || "");
-  const msgEl = document.getElementById("loginMsg");
-  if(msgEl) msgEl.textContent = "";
-
-  if(!email || !pass){
-    if(msgEl) msgEl.textContent = "Preencha e-mail e senha.";
-    return;
-  }
-
-  // Login Supabase
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if(error){
-    if(msgEl) msgEl.textContent = "Falha no login: " + (error.message || "verifique seus dados");
-    return;
-  }
-
-  // Vincula auth.user ao client_id
-  try { await sb.rpc("link_portal_user"); } catch(e){}
-
-  // Atualiza saudação
-  const prefix = email.split("@")[0] || "Cliente";
-  const hello = document.querySelector(".header-hello");
-  if(hello) hello.textContent = "Olá, " + (prefix.charAt(0).toUpperCase()+prefix.slice(1)) + " 👋";
-
-  // Esconde login screen
-  const ls = document.getElementById("loginScreen");
-  if(ls) ls.style.display = "none";
-
-  // Carrega credencial (não libera senha automaticamente)
-  await refreshCredentialPreview();
-}
-
+loadMessages();
 </script>
 </body>
 </html>
