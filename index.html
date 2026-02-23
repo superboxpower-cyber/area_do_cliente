@@ -550,9 +550,9 @@ main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; 
     <div class="cycle-top">
       <div>
         <div class="cycle-dates">
-          <span style="font-family:'DM Mono',monospace">15/02</span>
+          <span style="font-family:'DM Mono',monospace" id="cycleStart">—</span>
           <span class="cycle-arrow">→</span>
-          <span style="font-family:'DM Mono',monospace">15/03</span>
+          <span style="font-family:'DM Mono',monospace" id="cycleEnd">—</span>
         </div>
       </div>
 
@@ -560,9 +560,9 @@ main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; 
         <div class="gauge">
           <svg viewBox="0 0 72 72">
             <circle class="gauge-track" cx="36" cy="36" r="30"/>
-            <circle class="gauge-fill" cx="36" cy="36" r="30"/>
+            <circle class="gauge-fill" id="gaugeFill" cx="36" cy="36" r="30"/>
           </svg>
-          <div class="gauge-num">22</div>
+          <div class="gauge-num" id="gaugeDays">—</div>
         </div>
         <div class="gauge-lbl">dias rest.</div>
       </div>
@@ -570,11 +570,11 @@ main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; 
 
     <div style="position:relative;">
       <div class="progress-labels">
-        <span>15 FEV</span>
-        <span>15 MAR</span>
+        <span id="progressStart">—</span>
+        <span id="progressEnd">—</span>
       </div>
       <div class="progress-track">
-        <div class="progress-fill"></div>
+        <div class="progress-fill" id="progressFill"></div>
       </div>
     </div>
   </div>
@@ -741,6 +741,7 @@ async function refreshPortal() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spin');
   await loadMessages();
+  await loadCycle();
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
@@ -833,6 +834,7 @@ async function login() {
   document.getElementById('loginScreen').style.display = 'none';
   showToast('Bem-vindo, ' + nomeF + '!');
   await loadMessages();
+  await loadCycle();
 }
 
 /* ── UTILS ── */
@@ -862,7 +864,79 @@ function setEl(id, val) {
   if (el) el.textContent = val;
 }
 
+/* ── CICLO DINÂMICO ── */
+async function loadCycle() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+
+    const userEmail = session.user.email;
+
+    // Busca cliente pelo email
+    const { data: client } = await sb
+      .from('clients')
+      .select('id, due_day')
+      .eq('email', userEmail)
+      .eq('active', true)
+      .single();
+
+    if (!client) return;
+
+    // Busca último pagamento aprovado
+    const { data: payment } = await sb
+      .from('payment_history')
+      .select('payment_date')
+      .eq('client_id', client.id)
+      .eq('status', 'approved')
+      .order('payment_date', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!payment) return;
+
+    // Calcula ciclo: início = payment_date, fim = +30 dias
+    const inicio = new Date(payment.payment_date);
+    const fim    = new Date(inicio);
+    fim.setDate(fim.getDate() + 30);
+
+    const hoje         = new Date();
+    const totalDias    = 30;
+    const diasPassados = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
+    const diasRest     = Math.max(0, totalDias - diasPassados);
+    const pct          = Math.min(100, Math.round((diasPassados / totalDias) * 100));
+
+    // Formata datas
+    const fmt    = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+    const fmtMes = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' })
+                         .toUpperCase().replace('.','');
+
+    setEl('cycleStart',    fmt(inicio));
+    setEl('cycleEnd',      fmt(fim));
+    setEl('gaugeDays',     diasRest);
+    setEl('progressStart', fmtMes(inicio));
+    setEl('progressEnd',   fmtMes(fim));
+
+    // Barra de progresso
+    const bar = document.getElementById('progressFill');
+    if (bar) bar.style.width = pct + '%';
+
+    // Gauge SVG — circumference 2π×30 ≈ 188
+    const offset = 188 - (diasRest / totalDias) * 188;
+    const gauge  = document.getElementById('gaugeFill');
+    if (gauge) gauge.style.strokeDashoffset = offset;
+
+    // Cor de alerta conforme dias restantes
+    const numEl = document.getElementById('gaugeDays');
+    if (diasRest <= 5)       { if(numEl) numEl.style.color = '#EF4444'; if(gauge) gauge.style.stroke = '#EF4444'; }
+    else if (diasRest <= 10) { if(numEl) numEl.style.color = '#F59E0B'; }
+
+  } catch(e) {
+    console.warn('Erro ao carregar ciclo:', e);
+  }
+}
+
 loadMessages();
+loadCycle();
 </script>
 </body>
 </html>
