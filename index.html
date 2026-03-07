@@ -946,6 +946,7 @@ async function login() {
  showToast('Bem-vindo, ' + nomeF + '!');
  await loadMessages();
  await loadCycle();
+ await popup();
 }
 
 /* ── UTILS ── */
@@ -1099,6 +1100,7 @@ async function loadPopup() {
 
 loadMessages();
 loadCycle();
+loadPopup();
 </script>
 </body>
 </html>
