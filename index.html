@@ -477,6 +477,81 @@ main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; 
 }
 #loginMsg.err { color: var(--red); }
 
+
+/* ── ADMIN POPUP ── */
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  background: rgba(4,7,15,0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: none; align-items: center; justify-content: center;
+  padding: 22px;
+}
+.popup-overlay.show { display: flex; animation: fadeIn .25s ease both; }
+
+.popup-card {
+  width: 100%; max-width: 360px;
+  background: rgba(10,15,28,0.92);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(79,142,247,0.08);
+  backdrop-filter: blur(28px);
+  overflow: hidden;
+  animation: popIn .35s cubic-bezier(.4,0,.2,1) both;
+  position: relative;
+}
+.popup-card::before {
+  content:'';
+  position:absolute; inset:0 0 auto 0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+}
+.popup-head {
+  display:flex; align-items:center; gap:12px;
+  padding: 20px 20px 12px;
+}
+.popup-badge {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(79,142,247,0.18), rgba(139,92,246,0.18));
+  border: 1px solid rgba(79,142,247,0.22);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 1.25rem;
+  box-shadow: 0 0 20px rgba(79,142,247,0.14);
+}
+.popup-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.08rem; font-weight: 800; line-height: 1.15;
+}
+.popup-sub {
+  font-size: 0.68rem; color: var(--muted2);
+  text-transform: uppercase; letter-spacing: .08em; margin-top: 3px;
+}
+.popup-body {
+  padding: 0 20px 18px;
+}
+.popup-msg {
+  font-size: 0.95rem; line-height: 1.65; color: var(--text); font-weight: 500;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.popup-msg strong { color: #fff; font-weight: 800; }
+.popup-actions {
+  padding: 0 20px 20px;
+}
+.popup-btn {
+  width:100%; height:48px; border:none; border-radius:14px;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color:#fff; font-weight:700; font-size:0.9rem; cursor:pointer;
+  letter-spacing: 0.03em; font-family: 'Outfit', sans-serif;
+  box-shadow: 0 6px 24px rgba(37,99,235,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all .2s;
+}
+.popup-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(37,99,235,0.5); }
+.popup-btn:active { transform: scale(.98); }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
 /* ── ANIMATIONS ── */
 @keyframes slideUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none} }
 .card { animation: slideUp 0.5s ease both; }
@@ -673,6 +748,25 @@ main { position: relative; z-index: 10; padding: 16px 16px 32px; display: flex; 
 </main>
 
 <div class="toast" id="toast"></div>
+
+<div class="popup-overlay" id="adminPopupOverlay">
+  <div class="popup-card">
+    <div class="popup-head">
+      <div class="popup-badge" id="popupEmoji">📌</div>
+      <div>
+        <div class="popup-title" id="popupTitle">Aviso</div>
+        <div class="popup-sub">Administração BoxPower</div>
+      </div>
+    </div>
+    <div class="popup-body">
+      <div class="popup-msg" id="popupMessage">Carregando aviso...</div>
+    </div>
+    <div class="popup-actions">
+      <button class="popup-btn" id="popupBtn" onclick="closePopup()">Entendi</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 const SUPABASE_URL     = "https://epwmoicgvuprzkcpxjoy.supabase.co";
@@ -952,6 +1046,55 @@ if (isNaN(inicio.getTime())) return;
  } catch(e) {
    console.warn('Erro ao carregar ciclo:', e);
  }
+}
+
+
+/* ── POPUP SUPABASE ── */
+let currentPopup = null;
+
+function openPopup(data) {
+  currentPopup = data || null;
+  setEl('popupEmoji', data?.emoji || '📌');
+  setEl('popupTitle', data?.title || 'Aviso');
+  const msgEl = document.getElementById('popupMessage');
+  if (msgEl) msgEl.innerHTML = data?.message || 'Mensagem indisponível.';
+  const btn = document.getElementById('popupBtn');
+  if (btn) btn.textContent = data?.button_text || 'Entendi';
+  const overlay = document.getElementById('adminPopupOverlay');
+  if (overlay) overlay.classList.add('show');
+}
+
+function closePopup() {
+  const overlay = document.getElementById('adminPopupOverlay');
+  if (overlay) overlay.classList.remove('show');
+  if (currentPopup?.show_once && currentPopup?.id) {
+    try { localStorage.setItem('bp_popup_seen_' + currentPopup.id, '1'); } catch(_) {}
+  }
+}
+
+async function loadPopup() {
+  try {
+    const { data, error } = await sb
+      .from('admin_popup')
+      .select('id,title,message,button_text,active,show_once,priority,created_at')
+      .eq('active', true)
+      .order('priority', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return;
+
+    if (data.show_once) {
+      try {
+        if (localStorage.getItem('bp_popup_seen_' + data.id) === '1') return;
+      } catch(_) {}
+    }
+
+    openPopup(data);
+  } catch(e) {
+    console.warn('Erro ao carregar popup:', e);
+  }
 }
 
 loadMessages();
