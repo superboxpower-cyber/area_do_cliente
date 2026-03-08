@@ -111,7 +111,7 @@ header {
  border: 1px solid var(--border); background: var(--glass2);
  color: var(--muted2); display: flex; align-items: center; justify-content: center;
  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
- font-size: 0; /* hide text, show svg */
+ font-size: 0;
 }
 .hbtn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .hbtn:hover { border-color: var(--blue2); color: var(--blue2); background: rgba(79,142,247,0.1); box-shadow: 0 0 12px rgba(79,142,247,0.15); }
@@ -914,6 +914,7 @@ try {
      }, 15000);
    }
  } catch(e) { toast('Erro ao liberar senha.', 'warn'); }
+ finally { if (rb) rb.disabled = false; }
 }
 
 /* ── LOGIN ── */
@@ -931,7 +932,7 @@ async function login() {
    localStorage.removeItem('bp_creds');
  }
 
- const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+ const { error } = await sb.auth.signInWithPassword({ email, password: pass });
  if (error) {
    msgEl.textContent = 'Login inválido. Verifique seus dados.';
    msgEl.className = 'err'; return;
@@ -946,7 +947,7 @@ async function login() {
  showToast('Bem-vindo, ' + nomeF + '!');
  await loadMessages();
  await loadCycle();
- await popup();
+ await loadPopup();
 }
 
 /* ── UTILS ── */
@@ -976,79 +977,131 @@ function setEl(id, val) {
  if (el) el.textContent = val;
 }
 
+function resetCycleUI() {
+  setEl('cycleStart', '—');
+  setEl('cycleEnd', '—');
+  setEl('gaugeDays', '—');
+  setEl('progressStart', '—');
+  setEl('progressEnd', '—');
+  const bar = document.getElementById('progressFill');
+  if (bar) bar.style.width = '0%';
+  const gauge = document.getElementById('gaugeFill');
+  if (gauge) {
+    gauge.style.strokeDashoffset = 188;
+    gauge.style.stroke = '';
+  }
+  const numEl = document.getElementById('gaugeDays');
+  if (numEl) numEl.style.color = '';
+}
+
+function setCredentialState(active) {
+  const statusEl = document.querySelector('.cred-status');
+  const revealBtn = document.getElementById('reveal-btn');
+  const copyPass = document.getElementById('copy-pass');
+  const timerLbl = document.getElementById('timer-lbl');
+  const passVal = document.getElementById('pass-val');
+  const dotsView = document.getElementById('dots-view');
+
+  if (active) {
+    if (statusEl) {
+      statusEl.textContent = 'Ativo';
+      statusEl.style.color = 'var(--green)';
+      statusEl.style.background = 'rgba(16,185,129,0.08)';
+      statusEl.style.borderColor = 'rgba(16,185,129,0.2)';
+    }
+    if (revealBtn) {
+      revealBtn.style.display = 'inline-flex';
+      revealBtn.disabled = false;
+    }
+  } else {
+    if (statusEl) {
+      statusEl.textContent = 'Vencido';
+      statusEl.style.color = '#EF4444';
+      statusEl.style.background = 'rgba(239,68,68,0.08)';
+      statusEl.style.borderColor = 'rgba(239,68,68,0.2)';
+    }
+    if (revealBtn) revealBtn.style.display = 'none';
+    if (copyPass) copyPass.style.display = 'none';
+    if (timerLbl) timerLbl.style.display = 'none';
+    if (passVal) passVal.style.display = 'none';
+    if (dotsView) dotsView.style.display = 'inline';
+  }
+}
+
 /* ── CICLO DINÂMICO ── */
 async function loadCycle() {
  try {
+   resetCycleUI();
+   setCredentialState(false);
+
    const { data: { session } } = await sb.auth.getSession();
    if (!session) return;
 
    const userEmail = (session.user.email || '').trim().toLowerCase();
 
-const { data: client } = await sb
- .from('clients')
- .select('id, due_day')
- .ilike('email', userEmail)
- .eq('active', true)
- .maybeSingle();
+   const { data: client } = await sb
+     .from('clients')
+     .select('id, due_day')
+     .ilike('email', userEmail)
+     .eq('active', true)
+     .maybeSingle();
 
    if (!client) return;
 
-   // Busca último pagamento aprovado
-  const { data: payment } = await sb
- .from('payment_history')
- .select('payment_date')
- .eq('client_id', client.id)
- .in('status', ['approved','paid','pago'])
- .order('payment_date', { ascending: false })
- .limit(1)
- .maybeSingle();
+   const { data: payment } = await sb
+     .from('payment_history')
+     .select('payment_date')
+     .eq('client_id', client.id)
+     .in('status', ['approved','paid','pago'])
+     .order('payment_date', { ascending: false })
+     .limit(1)
+     .maybeSingle();
 
-   if (!payment) return;
+   if (!payment?.payment_date) return;
 
-   // Calcula ciclo: início = payment_date, fim = +30 dias
- if (!payment?.payment_date) return;
-const inicio = new Date(payment.payment_date);
-if (isNaN(inicio.getTime())) return;
-   const fim    = new Date(inicio);
-   fim.setDate(fim.getDate() + 30);
+   const inicio = new Date(payment.payment_date);
+   if (isNaN(inicio.getTime())) return;
 
-   const hoje         = new Date();
-   const totalDias    = 30;
-   const diasPassados = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
-   const diasRest     = Math.max(0, totalDias - diasPassados);
-   const pct          = Math.min(100, Math.round((diasPassados / totalDias) * 100));
+   const fim = new Date(inicio);
+   fim.setMonth(fim.getMonth() + 1);
 
-   // Formata datas
-   const fmt    = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
-   const fmtMes = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' })
-                        .toUpperCase().replace('.','');
+   const hoje = new Date();
+   const ativo = hoje <= fim;
 
-   setEl('cycleStart',    fmt(inicio));
-   setEl('cycleEnd',      fmt(fim));
-   setEl('gaugeDays',     diasRest);
+   const totalMs = Math.max(1, fim - inicio);
+   const passadosMs = Math.max(0, Math.min(totalMs, hoje - inicio));
+   const diasRest = Math.max(0, Math.ceil((fim - hoje) / (1000 * 60 * 60 * 24)));
+   const pct = Math.min(100, Math.max(0, Math.round((passadosMs / totalMs) * 100)));
+
+   const fmt = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+   const fmtMes = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' }).toUpperCase().replace('.','');
+
+   setEl('cycleStart', fmt(inicio));
+   setEl('cycleEnd', fmt(fim));
+   setEl('gaugeDays', diasRest);
    setEl('progressStart', fmtMes(inicio));
-   setEl('progressEnd',   fmtMes(fim));
+   setEl('progressEnd', fmtMes(fim));
 
-   // Barra de progresso
    const bar = document.getElementById('progressFill');
    if (bar) bar.style.width = pct + '%';
 
-   // Gauge SVG — circumference 2π×30 ≈ 188
-   const progress = Math.min(1, Math.max(0, diasPassados / totalDias));
-   const offset = 188 - progress * 188;
-   const gauge  = document.getElementById('gaugeFill');
+   const offset = 188 - (pct / 100) * 188;
+   const gauge = document.getElementById('gaugeFill');
    if (gauge) gauge.style.strokeDashoffset = offset;
 
-   // Cor de alerta conforme dias restantes
    const numEl = document.getElementById('gaugeDays');
-   if (diasRest <= 5)       { if(numEl) numEl.style.color = '#EF4444'; if(gauge) gauge.style.stroke = '#EF4444'; }
-   else if (diasRest <= 10) { if(numEl) numEl.style.color = '#F59E0B'; }
+   if (diasRest <= 5) {
+     if (numEl) numEl.style.color = '#EF4444';
+     if (gauge) gauge.style.stroke = '#EF4444';
+   } else if (diasRest <= 10) {
+     if (numEl) numEl.style.color = '#F59E0B';
+   }
 
+   setCredentialState(ativo);
  } catch(e) {
    console.warn('Erro ao carregar ciclo:', e);
  }
 }
-
 
 /* ── POPUP SUPABASE ── */
 let currentPopup = null;
