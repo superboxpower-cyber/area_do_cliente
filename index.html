@@ -438,6 +438,10 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <span class="nav-label">Avisos</span>
     <span class="nav-badge" id="msgBadge" style="display:none;">0</span>
    </a>
+   <a class="nav-item" id="nav-otimizador" onclick="showSection('otimizador')">
+    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+    <span class="nav-label">Otimizador VEO</span>
+   </a>
   </nav>
   <!-- FOOTER -->
   <!-- MESSAGES IN SIDEBAR -->
@@ -521,6 +525,43 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       <div class="msg-list" id="msgList"><div style="color:var(--muted);font-size:0.8rem;padding:20px 0;">Carregando...</div></div>
      </div>
     </div>
+   </div>
+  </div>
+
+  <!-- SECTION: OTIMIZADOR -->
+  <div class="section" id="section-otimizador">
+   <div class="section-title">Otimizador VEO3</div>
+   <div class="section-sub">Transforme o rascunho de vídeo numa cena de parágrafo único hiper formatada segundo as exigências da Google Flow.</div>
+    
+   <div class="card cred-card">
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+        <div class="cred-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(6,182,212,0.2));border:1px solid rgba(16,185,129,0.3);">✨</div>
+        <div><div style="font-weight:700;">Inteligência Artificial (Gemini)</div><div style="font-size:0.75rem; color:var(--muted);">Estruturador de Cenas</div></div>
+    </div>
+    
+    <div style="margin-bottom:16px;">
+        <label style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px;">1. Cole seu Roteiro / Ideia (PT-BR)</label>
+        <textarea id="veo3-input" rows="4" placeholder="Cole aqui as ideias geradas ou digitadas em português. Podem conter listas, quebras de linha e formatações desordenadas..." style="width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:14px; padding:16px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.9rem; resize:vertical; outline:none; transition: border-color 0.2s;"></textarea>
+    </div>
+    
+    <button id="btn-optimize" onclick="optimizePromptVEO()" style="width:100%; padding:15px; border-radius:14px; background:linear-gradient(135deg,#10B981,#06B6D4); border:none; color:#fff; font-weight:800; font-family:'Outfit',sans-serif; cursor:pointer; font-size:1rem; letter-spacing:0.03em; box-shadow:0 8px 30px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2); transition:transform 0.2s, box-shadow 0.2s;">⚡ FORMATAR ROTEIRO</button>
+    
+    <div id="veo3-result-container" style="display:none; margin-top:24px; padding-top:24px; border-top:1px dashed var(--border);">
+        <label style="font-size:0.75rem; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px;">2. Prompt Otimizado p/ Flow</label>
+        <div style="position:relative;">
+            <textarea id="veo3-output" rows="8" readonly style="width:100%; background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); border-radius:14px; padding:16px 16px 54px 16px; color:var(--green); font-family:'DM Mono',monospace; font-size:0.88rem; resize:none; outline:none; line-height:1.6;"></textarea>
+            <button onclick="copyVeoPrompt()" id="btn-copy-veo" style="position:absolute; bottom:12px; right:12px; height:34px; padding:0 16px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); border-radius:9px; color:#fff; font-size:0.75rem; font-weight:700; cursor:pointer; display:flex; gap:6px; align-items:center; transition: background 0.2s; font-family:'Outfit',sans-serif;">Copiar P/ o Flow</button>
+        </div>
+    </div>
+   </div>
+   
+   <div style="margin-top:16px; padding:18px 20px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:16px;">
+        <div style="font-weight:700; font-size:0.85rem; margin-bottom:8px; color:var(--muted2);">Regras Adotadas pela IA nos bastidores:</div>
+        <ul style="font-size:0.75rem; color:var(--muted); padding-left:14px; line-height:1.6;">
+            <li>Tradução meticulosa para o <strong style="color:var(--text);">Inglês Cinematográfico</strong>.</li>
+            <li>Compactação da cena em <strong style="color:var(--text);">1 Bloco Visual Contínuo</strong>.</li>
+            <li>Preservação intacta de <strong style="color:var(--text);">Falas e Diálogos</strong> em Português no final.</li>
+        </ul>
    </div>
   </div>
 
@@ -1052,6 +1093,92 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
   loadMessages();
  }catch(e){loadMessages();}
 })();
+
+/* ── OTIMIZADOR VEO GEMINI ── */
+const GEMINI_API_KEY = "AIzaSyDYQu410OBEGjSbSztXSIrhMswr6cCz2kE"; 
+
+async function optimizePromptVEO() {
+    const inputEl = document.getElementById('veo3-input');
+    const outCont = document.getElementById('veo3-result-container');
+    const outEl = document.getElementById('veo3-output');
+    const btn = document.getElementById('btn-optimize');
+
+    const draft = inputEl.value.trim();
+    if(!draft) {
+        showToast('Cole seu rascunho de cena primeiro!', 'warn');
+        return;
+    }
+    
+    btn.innerHTML = 'Processando na Cloud...';
+    btn.disabled = true;
+
+    if(GEMINI_API_KEY === 'SUA_API_KEY_AQUI') {
+        openPopup({ title: 'Atenção API Não Configurada', emoji: '⚠️', message: 'Sr. Administrador, por favor, configure a chave API do Google Gemini (GEMINI_API_KEY) no código fonte do portal (na linha 1060).<br><br>Feito isso os clientes poderão utilizar a ferramenta.', show_once: false });
+        btn.innerHTML = '⚡ FORMATAR ROTEIRO';
+        btn.disabled = false;
+        return;
+    }
+
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                contents: [{
+                    role: "user",
+                    parts: [{
+                        text: `Atue como um Engenheiro e Consultor de Prompt de Vídeo nativo de Los Angeles, Expert em "Google Veo (V3)" e "Google Flow".
+O usuário enviará um rascunho contendo descrições de cena e, ocasionalmente, falas/diálogos em português (Ex: "Fala:", "Cena:").
+SUA MISSÃO OBRIGATÓRIA:
+1. Isole a DESCRIÇÃO VISUAL DA CENA: Melhore, aplique termos cinematográficos dinâmicos e traduza TUDO RIGOROSAMENTE para o Inglês.
+2. Esta seção visual em Inglês deve ser construída como 1 ÚNICO PARÁGRAFO CONTÍNUO (Sem quebras de linha internas e sem listas).
+3. Isole as FALAS/DIÁLOGOS: MANTENHA COMO ESTÃO originais e no IDIOMA ORIGINAL (ex: Português). Não traduza as falas.
+4. ESTRUTURA FINAL EXATA:
+[Parágrafo único em Inglês descrevendo a cena visualmente com todos os detalhes]
+(pule duas linhas)
+[Falas/Diálogos literais do usuário original]
+
+NÃO use formatações Markdown (sem negritos **, sem asteriscos, sem listas). Apenas devolva o texto estruturado limpo.
+
+Roteiro fornecido:\n${draft}`
+                    }]
+                }],
+                generationConfig: { temperature: 0.6 }
+            })
+        });
+
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error?.message || 'Falha Externa na API Gemini');
+
+        const optimizedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if(optimizedText) {
+            outCont.style.display = 'block';
+            // Limpa markdown de asteriscos sem esmagar as quebras de linha das Falas
+            outEl.value = optimizedText.trim().replace(/[\*\_]+/g, '');
+            showToast('As regras rigorosas foram aplicadas!', 'success');
+        } else {
+            throw new Error('Formato da resposta não compreendido.');
+        }
+    } catch (e) {
+        showToast("Falha: " + e.message, 'warn');
+    } finally {
+        btn.innerHTML = '⚡ FORMATAR ROTEIRO';
+        btn.disabled = false;
+    }
+}
+
+function copyVeoPrompt() {
+    const el = document.getElementById('veo3-output');
+    navigator.clipboard.writeText(el.value).then(() => {
+        showToast('Sucesso! Pode colar no Flow.');
+        const btn = document.getElementById('btn-copy-veo');
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><polyline points="20 6 9 17 4 12"/></svg>Copiado';
+        btn.style.background = 'rgba(16,185,129,0.4)';
+        setTimeout(() => { btn.innerHTML = oldHtml; btn.style.background = 'rgba(16,185,129,0.15)'; }, 2000);
+    });
+}
 </script>
 </body>
 </html>
