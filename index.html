@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -910,7 +910,9 @@ async function loadProducts(client){
        for (let i = 1; i <= 3; i++) {
          const gm = c[`grok_email_${i}`] || currentClient?.[`grok_email_${i}`] || '';
          const gp = c[`grok_pass_${i}`] || currentClient?.[`grok_pass_${i}`] || '';
-         if (gm) {
+         const displayEmail = gm ? gm : 'Aguardando Atribuição...';
+          const passPlaceholder = gp ? '• • • • • • • •' : '...';
+          if (true) {
            hasAnyCred = true;
            html += `
              <div class="cred-field full" style="margin-bottom:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
@@ -921,13 +923,13 @@ async function loadProducts(client){
                  
                  <div class="cred-field-label">Email de Acesso (X/Twitter)</div>
                  <div class="cred-field-row" style="margin-bottom:10px;">
-                     <div class="cred-val" id="grok-email-${i}">${gm}</div>
+                     <div class="cred-val" id="grok-email-${i}" style="${!gm ? 'color:var(--muted);font-style:italic;' : ''}">${displayEmail}</div>
                      <button class="btn-reveal" style="margin-left:8px;padding:0 10px;font-size:0.75rem;" onclick="navigator.clipboard.writeText('${gm}');showToast('Email copiado!')">Copiar</button>
                  </div>
 
                  <div class="cred-field-label">Senha de Acesso</div>
                  <div class="cred-field-row">
-                     <div class="cred-val"><span class="dots-anim" id="grok-dots-${i}">• • • • • • • •</span><span id="grok-pass-val-${i}" style="display:none;">${gp}</span></div>
+                     <div class="cred-val"><span class="dots-anim" id="grok-dots-${i}" style="${!gp ? 'letter-spacing:normal;color:var(--muted);font-style:italic;' : ''}">${passPlaceholder}</span><span id="grok-pass-val-${i}" style="display:none;">${gp}</span></div>
                      <div class="field-actions">
                          <button class="btn-reveal" id="grok-copy-pass-${i}" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('grok-pass-val-${i}').textContent.trim());showToast('Senha copiada!')">Copiar</button>
                          <button class="btn-reveal" id="grok-reveal-btn-${i}" onclick="
@@ -947,8 +949,8 @@ async function loadProducts(client){
        } else {
          html += `
          <div class="cred-field full" style="text-align:center;padding-top:12px;">
-           <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Use uma das suas credenciais exclusivas acima para logar no Twitter (X) e abrir o <strong>Grok Inteligência Artificial</strong>.</div>
-           <a href="https://x.com/i/grok" target="_blank" rel="noopener">
+           <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Use uma das suas credenciais exclusivas acima para logar no GROK</div>
+           <a href="https://accounts.x.ai/sign-in?redirect=grok-com&email=true" target="_blank" rel="noopener">
              <button class="btn-login" style="width:auto;padding:0 30px;height:40px;font-size:0.85rem;background:linear-gradient(135deg, #f59e0b, #d97706); border-color:#d97706;">⚡ Acessar Grok no X</button>
            </a>
          </div>`;
