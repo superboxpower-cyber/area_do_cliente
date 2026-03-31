@@ -643,6 +643,16 @@ async function login(){
 }
 
 async function enterPortal(client){
+ // O RPC (validate_portal_login) é antigo e não retorna as novas colunas grok_email_...
+ // Fazemos um fetch direto no clients para mesclar os dados reais e atualizados do banco.
+ try {
+   const { data: fullData } = await sbPublic.from('clients').select('*').eq('email', client.email).maybeSingle();
+   if(fullData) {
+       client = { ...client, ...fullData };
+       currentClient = client;
+   }
+ } catch(e) {}
+
  const nome=(client.name||client.email.split('@')[0]);
  const nomeF=nome.split(' ')[0];
  const clientId=makeClientId(client.id);
@@ -680,10 +690,19 @@ const PRODUCT_CATALOG = {
 async function loadProducts(client){
   const grid = document.getElementById('productsGrid');
   if(!grid) return;
-  grid.innerHTML = '';
+  
+  // Se não recebemos o client explícito, tentamos fazer fetch das novidades direto na base (Refresh button)
+  if(!client && currentClient?.email) {
+      try {
+          const { data: updatedC } = await sbPublic.from('clients').select('*').eq('email', currentClient.email).maybeSingle();
+          if(updatedC) currentClient = { ...currentClient, ...updatedC };
+      } catch(e) {}
+  }
   
   const c = client || currentClient;
   if(!c) return;
+  
+  grid.innerHTML = '';
   
   // Safely parse products if it came stringified
   let prodsData = c.products;
