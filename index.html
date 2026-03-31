@@ -674,7 +674,7 @@ const PRODUCT_CATALOG = {
   "783f332d-1213-4c14-b1ca-26f06577c898": { name: "Google VEO Ultra", icon: "🚀", color: "--amber", colorRaw: "245,158,11" },
   "126dd98c-5edb-4d4c-8a30-4142f5bfd016": { name: "Canva PRO", icon: "🎨", color: "--blue", colorRaw: "79,142,247" },
   "ac2d1bc9-d97b-4003-aaba-bfab9cadbd7f": { name: "ReelShort", icon: "📱", color: "--red", colorRaw: "239,68,68" },
-  "b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e": { name: "xAI Grok Premium", icon: "⚡", color: "--amber", colorRaw: "245,158,11" }
+  "033c664e-2a58-4893-919c-a84345fff0c6": { name: "xAI Grok Premium", icon: "⚡", color: "--amber", colorRaw: "245,158,11" }
 };
 
 async function loadProducts(client){
@@ -700,8 +700,8 @@ async function loadProducts(client){
   // FAILSAFE: Se a inteligência (Mike) esqueceu de cadastrar o produto na array 'products',
   // mas preencheu as colunas do grok, ejetamos o ID do Grok na marra para renderizar.
   if (c.grok_email_1 || c.grok_email_2 || c.grok_email_3 || c.grok_pass_1 || c.grok_pass_2 || c.grok_pass_3) {
-      if (!prods.includes('b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e')) {
-          prods.push('b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e');
+      if (!prods.includes('033c664e-2a58-4893-919c-a84345fff0c6')) {
+          prods.push('033c664e-2a58-4893-919c-a84345fff0c6');
       }
   }
   
@@ -881,7 +881,7 @@ async function loadProducts(client){
          </div>
        </div>`;
      } else if (
-       pid === 'b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e' || 
+       pid === '033c664e-2a58-4893-919c-a84345fff0c6' || 
        meta.name.toLowerCase().includes("grok") || 
        (typeof pid === 'string' && pid.toLowerCase().includes('grok'))
      ) {
