@@ -697,6 +697,14 @@ async function loadProducts(client){
   }
   const prods = Array.isArray(prodsData) ? prodsData.filter(x => x && x !== 'null') : [];
   
+  // FAILSAFE: Se a inteligência (Mike) esqueceu de cadastrar o produto na array 'products',
+  // mas preencheu as colunas do grok, ejetamos o ID do Grok na marra para renderizar.
+  if (c.grok_email_1 || c.grok_email_2 || c.grok_email_3 || c.grok_pass_1 || c.grok_pass_2 || c.grok_pass_3) {
+      if (!prods.includes('b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e')) {
+          prods.push('b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e');
+      }
+  }
+  
   let html = '';
   if (prods.length === 0) {
     html += '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--muted); border: 1px dashed rgba(255,255,255,0.15); border-radius: 20px; font-weight: 500;">Nenhuma assinatura de produto ativa localizada na sua conta.</div>';
