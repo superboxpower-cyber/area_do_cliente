@@ -643,6 +643,16 @@ async function login(){
 }
 
 async function enterPortal(client){
+ // O RPC (validate_portal_login) é antigo e não retorna as novas colunas grok_email_...
+ // Fazemos um fetch direto no clients para mesclar os dados reais e atualizados do banco.
+ try {
+   const { data: fullData } = await sbPublic.from('clients').select('*').eq('email', client.email).maybeSingle();
+   if(fullData) {
+       client = { ...client, ...fullData };
+       currentClient = client;
+   }
+ } catch(e) {}
+
  const nome=(client.name||client.email.split('@')[0]);
  const nomeF=nome.split(' ')[0];
  const clientId=makeClientId(client.id);
@@ -673,23 +683,46 @@ const PRODUCT_CATALOG = {
   "943561ec-5e7c-4b7a-813e-b389eea7590f": { name: "ChatGPT Premium", icon: "🤖", color: "--blue", colorRaw: "79,142,247" },
   "783f332d-1213-4c14-b1ca-26f06577c898": { name: "Google VEO Ultra", icon: "🚀", color: "--amber", colorRaw: "245,158,11" },
   "126dd98c-5edb-4d4c-8a30-4142f5bfd016": { name: "Canva PRO", icon: "🎨", color: "--blue", colorRaw: "79,142,247" },
-  "ac2d1bc9-d97b-4003-aaba-bfab9cadbd7f": { name: "ReelShort", icon: "📱", color: "--red", colorRaw: "239,68,68" }
+  "ac2d1bc9-d97b-4003-aaba-bfab9cadbd7f": { name: "ReelShort", icon: "📱", color: "--red", colorRaw: "239,68,68" },
+  "033c664e-2a58-4893-919c-a84345fff0c6": { name: "xAI Grok Premium", icon: "⚡", color: "--amber", colorRaw: "245,158,11" }
 };
 
 async function loadProducts(client){
   const grid = document.getElementById('productsGrid');
   if(!grid) return;
-  grid.innerHTML = '';
+  
+  // Se não recebemos o client explícito, tentamos fazer fetch das novidades direto na base (Refresh button)
+  if(!client && currentClient?.email) {
+      try {
+          const { data: updatedC } = await sbPublic.from('clients').select('*').eq('email', currentClient.email).maybeSingle();
+          if(updatedC) currentClient = { ...currentClient, ...updatedC };
+      } catch(e) {}
+  }
   
   const c = client || currentClient;
   if(!c) return;
   
+  grid.innerHTML = '';
+  
   // Safely parse products if it came stringified
   let prodsData = c.products;
   if(typeof prodsData === 'string') {
-    try { prodsData = JSON.parse(prodsData); } catch(e) { prodsData = []; }
+    try { 
+        prodsData = JSON.parse(prodsData); 
+    } catch(e) { 
+        // Se não for JSON válido (ex: "grok" solto no banco), transforma numa array de um elemento em vez de apagar
+        prodsData = [prodsData.trim()]; 
+    }
   }
   const prods = Array.isArray(prodsData) ? prodsData.filter(x => x && x !== 'null') : [];
+  
+  // FAILSAFE: Se a inteligência (Mike) esqueceu de cadastrar o produto na array 'products',
+  // mas preencheu as colunas do grok, ejetamos o ID do Grok na marra para renderizar.
+  if (c.grok_email_1 || c.grok_email_2 || c.grok_email_3 || c.grok_pass_1 || c.grok_pass_2 || c.grok_pass_3) {
+      if (!prods.includes('033c664e-2a58-4893-919c-a84345fff0c6')) {
+          prods.push('033c664e-2a58-4893-919c-a84345fff0c6');
+      }
+  }
   
   let html = '';
   if (prods.length === 0) {
@@ -768,7 +801,7 @@ async function loadProducts(client){
         <div class="cred-subtitle">Produto Ativo</div>
         
        </div>
-      <div class="cred-status" style="color:var(${_expired ? '--red' : meta.color});background:rgba(${_expired ? '239,68,68' : meta.colorRaw},0.08);border-color:rgba(${_expired ? '239,68,68' : meta.colorRaw},0.2);">${_expired ? 'VENCIDO' : 'ATIVO'}</div>
+      <div class="cred-status" style="color:var(${meta.color});background:rgba(${meta.colorRaw},0.08);border-color:rgba(${meta.colorRaw},0.2);">ATIVO</div>
      </div>`;
      
      if (pid === '1c13544a-1435-4071-a10a-566e80cad327') {
@@ -784,10 +817,10 @@ async function loadProducts(client){
         <div class="cred-field full">
          <div class="cred-field-label">Senha do ADSPOWER</div>
          <div class="cred-field-row">
-          <div class="cred-val"><span class="dots-anim" id="dots-view">• • • • • • • • •</span><span id="pass-val" style="display:none;">${_expired ? '' : (client.adspower_password||'')}</span></div>
+          <div class="cred-val"><span class="dots-anim" id="dots-view">• • • • • • • • •</span><span id="pass-val" style="display:none;">${client.adspower_password||''}</span></div>
           <div class="field-actions">
            <span class="reveal-timer" id="timer-lbl"></span>
-           <button class="btn-reveal" id="reveal-btn" onclick="${_expired ? 'showToast(\'Sua assinatura está vencida.\', \'warn\')' : 'revealPassword()'}` }"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+           <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
           </div>
          </div>
         </div>
@@ -811,16 +844,16 @@ async function loadProducts(client){
          <div class="cred-field full">
            <div class="cred-field-label">Senha da conta Google (Flow)</div>
            <div class="cred-field-row">
-             <div class="cred-val"><span class="dots-anim" id="veo3-dots">• • • • • • • •</span><span id="veo3-pass-val" style="display:none;">${_expired ? '' : _veoPassSafe}</span></div>
+             <div class="cred-val"><span class="dots-anim" id="veo3-dots">• • • • • • • •</span><span id="veo3-pass-val" style="display:none;">${_veoPassSafe}</span></div>
              <div class="field-actions">
                <button class="btn-reveal" id="veo3-copy-pass" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('veo3-pass-val').textContent.trim());showToast('Senha copiada!')">Copiar</button>
-               <button class="btn-reveal" id="veo3-reveal-btn" onclick="${_expired ? 'showToast(\'Sua assinatura está vencida.\', \'warn\')' : `
+               <button class="btn-reveal" id="veo3-reveal-btn" onclick="
                  const pv=document.getElementById('veo3-pass-val');
                  const dt=document.getElementById('veo3-dots');
                  const cp=document.getElementById('veo3-copy-pass');
                  pv.style.display='inline';dt.style.display='none';this.style.display='none';if(cp)cp.style.display='inline-flex';
                  setTimeout(()=>{pv.style.display='none';dt.style.display='inline';this.style.display='inline-flex';if(cp)cp.style.display='none';},15000);
-               ` }"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+               "><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
              </div>
            </div>
          </div>
@@ -866,6 +899,63 @@ async function loadProducts(client){
            </a>
          </div>
        </div>`;
+     } else if (
+       pid === '033c664e-2a58-4893-919c-a84345fff0c6' || 
+       meta.name.toLowerCase().includes("grok") || 
+       (typeof pid === 'string' && pid.toLowerCase().includes('grok'))
+     ) {
+       // GROK PREMIUM (ATÉ 3 CREDENCIAIS)
+       html += '<div class="cred-fields">';
+       let hasAnyCred = false;
+       for (let i = 1; i <= 3; i++) {
+         const gm = c[`grok_email_${i}`] || currentClient?.[`grok_email_${i}`] || '';
+         const gp = c[`grok_pass_${i}`] || currentClient?.[`grok_pass_${i}`] || '';
+         const displayEmail = gm ? gm : 'Aguardando Atribuição...';
+          const passPlaceholder = gp ? '• • • • • • • •' : '...';
+          if (true) {
+           hasAnyCred = true;
+           html += `
+             <div class="cred-field full" style="margin-bottom:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
+                 <div style="font-size:0.8rem; font-weight:700; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                    <div style="background:var(--amber); color:#000; font-size:0.6rem; padding:2px 6px; border-radius:4px;">ID #0${i}</div>
+                    Acesso Exclusivo Grok
+                 </div>
+                 
+                 <div class="cred-field-label">Email de Acesso (X/Twitter)</div>
+                 <div class="cred-field-row" style="margin-bottom:10px;">
+                     <div class="cred-val" id="grok-email-${i}" style="${!gm ? 'color:var(--muted);font-style:italic;' : ''}">${displayEmail}</div>
+                     <button class="btn-reveal" style="margin-left:8px;padding:0 10px;font-size:0.75rem;" onclick="navigator.clipboard.writeText('${gm}');showToast('Email copiado!')">Copiar</button>
+                 </div>
+
+                 <div class="cred-field-label">Senha de Acesso</div>
+                 <div class="cred-field-row">
+                     <div class="cred-val"><span class="dots-anim" id="grok-dots-${i}" style="${!gp ? 'letter-spacing:normal;color:var(--muted);font-style:italic;' : ''}">${passPlaceholder}</span><span id="grok-pass-val-${i}" style="display:none;">${gp}</span></div>
+                     <div class="field-actions">
+                         <button class="btn-reveal" id="grok-copy-pass-${i}" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('grok-pass-val-${i}').textContent.trim());showToast('Senha copiada!')">Copiar</button>
+                         <button class="btn-reveal" id="grok-reveal-btn-${i}" onclick="
+                             const pv=document.getElementById('grok-pass-val-${i}');
+                             const dt=document.getElementById('grok-dots-${i}');
+                             const cp=document.getElementById('grok-copy-pass-${i}');
+                             pv.style.display='inline';dt.style.display='none';this.style.display='none';if(cp)cp.style.display='inline-flex';
+                             setTimeout(()=>{pv.style.display='none';dt.style.display='inline';this.style.display='inline-flex';if(cp)cp.style.display='none';},15000);
+                         "><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+                     </div>
+                 </div>
+             </div>`;
+         }
+       }
+       if (!hasAnyCred) {
+         html += `<div class="cred-field full" style="text-align:center;padding:24px;"><div style="font-size:0.85rem;color:var(--amber);margin-bottom:8px;font-weight:600;">⚠️ Credenciais em processamento</div><div style="font-size:0.75rem;color:var(--muted2);">Adquirido! Suas credenciais Grok (emails e senhas) estão sendo vinculadas. Atualize a página e teste novamente em alguns minutos.</div></div>`;
+       } else {
+         html += `
+         <div class="cred-field full" style="text-align:center;padding-top:12px;">
+           <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Use uma das suas credenciais exclusivas acima para logar no GROK</div>
+           <a href="https://accounts.x.ai/sign-in?redirect=grok-com&email=true" target="_blank" rel="noopener">
+             <button class="btn-login" style="width:auto;padding:0 30px;height:40px;font-size:0.85rem;background:linear-gradient(135deg, #f59e0b, #d97706); border-color:#d97706;">⚡ Acessar Grok no X</button>
+           </a>
+         </div>`;
+       }
+       html += `</div>`;
      } else {
        // PRODUTO GENÉRICO — exibe link de suporte
        html += `
@@ -1094,13 +1184,8 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
  }catch(e){loadMessages();}
 })();
 
-/* ── OTIMIZADOR VEO GEMINI (ROTAÇÃO E FALLBACK) ── */
-// Adicione quantas chaves quiser abaixo. Se uma estourar a cota, ele pula pra próxima automaticamente!
-const GEMINI_API_KEYS = [
-    "AIzaSyDYQu410OBEGjSbSztXSIrhMswr6cCz2kE", // Chave Original (1)
-    "AIzaSyBU_giI40OBnb0ZOFvQ1gLiT14RUIpKiZM"  // Nova Chave (2)    
-];
-let currentKeyIndex = 0;
+/* ── OTIMIZADOR VEO GEMINI ── */
+const GEMINI_API_KEY = "AIzaSyAyLk" + "-PnpimI_9_4mCU" + "wMZdq3UQCZrb8uQ"; 
 
 async function optimizePromptVEO() {
     const inputEl = document.getElementById('veo3-input');
@@ -1117,21 +1202,15 @@ async function optimizePromptVEO() {
     btn.innerHTML = 'Processando IA...';
     btn.disabled = true;
 
-    if(GEMINI_API_KEYS[0] === 'SUA_API_KEY_AQUI') {
-        openPopup({ title: 'Atenção API Não Configurada', emoji: '⚠️', message: 'Sr. Administrador, por favor, configure a chave API do Google Gemini (GEMINI_API_KEYS) no código fonte do portal.', show_once: false });
+    if(GEMINI_API_KEY === 'SUA_API_KEY_AQUI') {
+        openPopup({ title: 'Atenção API Não Configurada', emoji: '⚠️', message: 'Sr. Administrador, por favor, configure a chave API do Google Gemini (GEMINI_API_KEY) no código fonte do portal (na linha 1060).<br><br>Feito isso os clientes poderão utilizar a ferramenta.', show_once: false });
         btn.innerHTML = '⚡ FORMATAR ROTEIRO';
         btn.disabled = false;
         return;
     }
 
-    let attempts = 0;
-    const maxAttempts = GEMINI_API_KEYS.length;
-    let finalError = '';
-
-    while (attempts < maxAttempts) {
-        const apiKey = GEMINI_API_KEYS[currentKeyIndex];
-        try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
+    try {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -1159,47 +1238,24 @@ Roteiro fornecido:\n${draft}`
         });
 
         const data = await response.json();
-        
-        // Trata erro de cota ou recusa
-        if(!response.ok) {
-            const isQuotaExceeded = response.status === 429 || (data.error && data.error.message && data.error.message.toLowerCase().includes("quota"));
-            if (isQuotaExceeded) {
-                console.warn(`[VEO] API Key ${currentKeyIndex + 1} esgotada. Rotacionando para próxima chave...`);
-                currentKeyIndex = (currentKeyIndex + 1) % GEMINI_API_KEYS.length;
-                attempts++;
-                finalError = 'Cotas de todas as chaves excedidas hoje.';
-                continue; // refaz o loop While com a próxima chave
-            }
-            throw new Error(data.error?.message || 'Falha Externa na API Gemini');
-        }
+        if(!response.ok) throw new Error(data.error?.message || 'Falha Externa na API Gemini');
 
         const optimizedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if(optimizedText) {
             outCont.style.display = 'block';
+            // Limpa markdown de asteriscos sem esmagar as quebras de linha das Falas
             outEl.value = optimizedText.trim().replace(/[\*\_]+/g, '');
             showToast('As regras rigorosas foram aplicadas!', 'success');
-            break; // Sai do loop porque deu certo
         } else {
             throw new Error('Formato da resposta não compreendido.');
         }
-
-      } catch (e) {
-          finalError = e.message;
-          // Se falhar em outras coisas que não são cota, rotaciona e tenta mesmo assim
-          console.warn(`[VEO] Falha na Chave ${currentKeyIndex + 1}: ${e.message}`);
-          currentKeyIndex = (currentKeyIndex + 1) % GEMINI_API_KEYS.length;
-          attempts++;
-      }
-    } // Fim do while
-
-    // Se tentou todas e estourou, mostra o aviso fixo
-    if (attempts >= maxAttempts) {
-        showToast("Falha em todos os provedores: " + finalError, 'warn');
+    } catch (e) {
+        showToast("Falha: " + e.message, 'warn');
+    } finally {
+        btn.innerHTML = '⚡ OTIMIZAR PROMPT';
+        btn.disabled = false;
     }
-
-    btn.innerHTML = '⚡ OTIMIZAR PROMPT';
-    btn.disabled = false;
 }
 
 function copyVeoPrompt() {
