@@ -1212,12 +1212,16 @@ async function optimizePromptVEO() {
     const apiKeyString = GEMINI_API_KEY;
     // Pega todas as chaves separadas por vírgula que foram jogadas lá em cima
     const apiKeys = apiKeyString.split(',').map(k => k.trim()).filter(k => k);
+    const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
     let finalError = '';
 
     for (let i = 0; i < apiKeys.length; i++) {
+      for (let j = 0; j < fallbackModels.length; j++) {
         const apiKey = apiKeys[i];
+        const currentModel = fallbackModels[j];
+        
         try {
-            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -1249,7 +1253,8 @@ Roteiro fornecido:\n${draft}`
             if(!response.ok) {
                 const isQuota = response.status === 429 || (data.error && data.error.message && data.error.message.toLowerCase().includes("quota"));
                 if(isQuota) {
-                    finalError = 'Cotas gratuitas esgotadas.';
+                    finalError = `Cota esgotada na Chave ${i+1} usando o modelo ${currentModel}. Tentando o próximo...`;
+                    console.warn(`[VEO] API Key limit reached for ${currentModel}. Pivoting.`);
                     continue; // Pula pra próxima
                 }
                 throw new Error(data.error?.message || 'Falha Externa na API Gemini');
@@ -1261,7 +1266,7 @@ Roteiro fornecido:\n${draft}`
                 outCont.style.display = 'block';
                 // Limpa markdown de asteriscos sem esmagar as quebras de linha das Falas
                 outEl.value = optimizedText.trim().replace(/[\*\_]+/g, '');
-                showToast('As regras rigorosas foram aplicadas!', 'success');
+                showToast('As regras rigorosas foram aplicadas pelo '+currentModel+'!', 'success');
                 
                 // Deu certo! Libera botão e SAI da função pra não tentar mais.
                 btn.innerHTML = '⚡ OTIMIZAR PROMPT';
@@ -1274,9 +1279,10 @@ Roteiro fornecido:\n${draft}`
             finalError = e.message;
             // Se o erro for outro, continua tentando as outras chaves.
         }
-    } // Fim do For
+      } // Fim For Models
+    } // Fim For Keys
 
-    // Se saiu do For é porque NENHUMA chave deu certo.
+    // Se saiu dos Fors é porque TODAS as chaves e modelos deram cota excedida.
     showToast("A IA atingiu limite de usuários diários. Tente mais tarde. " + finalError, 'warn');
     btn.innerHTML = '⚡ OTIMIZAR PROMPT';
     btn.disabled = false;
