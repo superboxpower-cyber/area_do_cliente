@@ -1186,37 +1186,8 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
 })();
 
 /* ── OTIMIZADOR VEO GEMINI ── */
-const GEMINI_API_KEYS = [
-  'AIzaSyDYQu410OBEGjSbSztXSIrhMswr6cCz2kE',
-  'AIzaSyBU_giI40OBnb0ZOFvQ1gLiT14RUIpKiZM',
-  'AIzaSyAyLk-PnpimI_9_4mCUwMZdq3UQCZrb8uQ',
-  'AIzaSyAJmYNIEbisU9kehac7QPJJN-2MekSM9S8'
-].map(k => k.trim()).filter(Boolean);
-const GEMINI_FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
-
-function buildVeoSystemPrompt(draft) {
-  return `Você é o Mike Prompt Engine, um chatbot especialista em otimização de prompts para Google Veo e Google Flow.
-Sua função é receber um rascunho em português e devolver uma versão cinematográfica, hiper clara e pronta para colar.
-
-REGRAS OBRIGATÓRIAS:
-1. Extraia a descrição visual e reescreva em inglês cinematográfico de alto nível.
-2. A parte visual deve sair em UM ÚNICO PARÁGRAFO CONTÍNUO, sem listas e sem markdown.
-3. Se houver falas ou diálogos no texto original, preserve essas falas no idioma original do usuário.
-4. Depois do parágrafo visual, pule duas linhas e coloque as falas literais, se existirem.
-5. Não use markdown, não use bullets, não use títulos.
-6. Responda somente com o prompt final otimizado.
-
-RASCUNHO ORIGINAL:\n${draft}`;
-}
-
-function classifyGeminiError(status, data) {
-  const msg = String(data?.error?.message || '').toLowerCase();
-  if (status === 429 || msg.includes('quota') || msg.includes('rate limit') || msg.includes('resource exhausted')) return 'quota';
-  if (status === 400 && (msg.includes('api key not valid') || msg.includes('api_key_invalid') || msg.includes('api key expired'))) return 'invalid_key';
-  if (status === 403 || msg.includes('permission') || msg.includes('access not configured') || msg.includes('api has not been used')) return 'forbidden';
-  if (status === 404 || msg.includes('not found') || msg.includes('is not found for api version')) return 'model';
-  return 'other';
-}
+const VEO_OPTIMIZER_URL = 'https://bot.boxpower.com.br/veo/optimize';
+const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
 
 async function optimizePromptVEO() {
     const inputEl = document.getElementById('veo3-input');
@@ -1230,61 +1201,40 @@ async function optimizePromptVEO() {
         return;
     }
 
-    if(!GEMINI_API_KEYS.length) {
-        showToast('Otimizador indisponível: nenhuma chave Gemini configurada.', 'warn');
-        return;
-    }
-
     btn.innerHTML = '🤖 Pensando no melhor prompt...';
     btn.disabled = true;
 
-    const attemptLog = [];
+    try {
+        const response = await fetch(VEO_OPTIMIZER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+            },
+            body: JSON.stringify({ draft })
+        });
 
-    for (let i = 0; i < GEMINI_API_KEYS.length; i++) {
-      for (let j = 0; j < GEMINI_FALLBACK_MODELS.length; j++) {
-        const apiKey = GEMINI_API_KEYS[i];
-        const currentModel = GEMINI_FALLBACK_MODELS[j];
+        const data = await response.json();
 
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    contents: [{ role: 'user', parts: [{ text: buildVeoSystemPrompt(draft) }] }],
-                    generationConfig: { temperature: 0.6 }
-                })
-            });
-
-            const data = await response.json();
-
-            if(!response.ok) {
-                const kind = classifyGeminiError(response.status, data);
-                attemptLog.push(`chave ${i+1} • ${currentModel} • ${kind}`);
-                continue;
-            }
-
-            const optimizedText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n').trim();
-
-            if(optimizedText) {
-                outCont.style.display = 'block';
-                outEl.value = optimizedText.replace(/[\*_]+/g, '').trim();
-                showToast('Prompt otimizado com sucesso por ' + currentModel + '!', 'success');
-                btn.innerHTML = '⚡ OTIMIZAR PROMPT';
-                btn.disabled = false;
-                return;
-            }
-
-            attemptLog.push(`chave ${i+1} • ${currentModel} • resposta vazia`);
-        } catch (e) {
-            attemptLog.push(`chave ${i+1} • ${currentModel} • ${String(e.message || e)}`);
+        if(!response.ok || !data?.ok || !data?.text) {
+            const attempts = Array.isArray(data?.attempts) ? data.attempts : [];
+            outCont.style.display = 'block';
+            outEl.value = 'Não consegui gerar o prompt agora.\n\nMotivos tentados:\n- ' + (attempts.length ? attempts.slice(0, 8).join('\n- ') : 'backend indisponível');
+            showToast('Otimizador indisponível no momento. Tente novamente.', 'warn');
+            btn.innerHTML = '⚡ OTIMIZAR PROMPT';
+            btn.disabled = false;
+            return;
         }
-      }
+
+        outCont.style.display = 'block';
+        outEl.value = String(data.text || '').trim();
+        showToast('Prompt otimizado com sucesso por ' + (data.model || 'IA') + '!', 'success');
+    } catch (e) {
+        outCont.style.display = 'block';
+        outEl.value = 'Falha de conexão com o otimizador. Tente novamente em instantes.';
+        showToast('Falha ao conectar no backend do otimizador.', 'warn');
     }
 
-    console.warn('[VEO OPTIMIZER] Falha em todas as tentativas:', attemptLog);
-    outCont.style.display = 'block';
-    outEl.value = 'Não consegui gerar o prompt agora.\n\nMotivos tentados:\n- ' + attemptLog.slice(0, 8).join('\n- ');
-    showToast('Otimizador indisponível no momento. Verifique chaves/modelos.', 'warn');
     btn.innerHTML = '⚡ OTIMIZAR PROMPT';
     btn.disabled = false;
 }
