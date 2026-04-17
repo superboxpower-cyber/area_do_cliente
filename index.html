@@ -634,18 +634,22 @@ async function login(){
    const raw = String(error.message || error.details || error.hint || '').toLowerCase();
    const isNetwork = raw.includes('failed to fetch') || raw.includes('network') || raw.includes('fetch');
    const isSchema = raw.includes('relation') || raw.includes('function') || raw.includes('schema');
-   msgEl.textContent = isNetwork
+   const finalMessage = isNetwork
     ? 'Falha de conexão ao verificar acesso. Tente novamente em instantes.'
     : isSchema
       ? 'O portal está em atualização. Tente novamente em instantes.'
       : 'Erro ao verificar acesso.';
+   msgEl.textContent = finalMessage;
    msgEl.className='err';
+   sendPortalLoginLog({ email, status:'rpc_error', detail: raw || 'unknown', userAgent: navigator.userAgent });
    return;
   }
-  if(!result){msgEl.textContent='Acesso não encontrado.';msgEl.className='err';return;}
+  if(!result){msgEl.textContent='Acesso não encontrado.';msgEl.className='err';sendPortalLoginLog({ email, status:'not_found', detail:'empty_result', userAgent: navigator.userAgent });return;}
   if(result.error){
    const errs={'invalid_credentials':'PIN ou e-mail incorretos.','portal_exclusivo_boxpower':'Portal exclusivo BoxPower.'};
-   msgEl.textContent=errs[result.error]||'Acesso negado.';msgEl.className='err';return;
+   msgEl.textContent=errs[result.error]||'Acesso negado.';msgEl.className='err';
+   sendPortalLoginLog({ email, status:'denied', detail: result.error || 'unknown', userAgent: navigator.userAgent });
+   return;
   }
 
   if(document.getElementById('rememberMe').checked){
@@ -654,11 +658,13 @@ async function login(){
 
   currentClient=result;
   currentPin=pin;
+  sendPortalLoginLog({ email, status:'success', detail:'login_ok', userAgent: navigator.userAgent });
   await enterPortal(result);
  } catch(err) {
   console.error('login unexpected error:', err);
   msgEl.textContent='Falha inesperada ao entrar. Tente novamente.';
   msgEl.className='err';
+  sendPortalLoginLog({ email, status:'unexpected_error', detail:String(err && err.message || err || 'unknown'), userAgent: navigator.userAgent });
  }
 }
 
@@ -1206,7 +1212,21 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
 
 /* ── OTIMIZADOR VEO GEMINI ── */
 const VEO_OPTIMIZER_URL = 'https://api.boxpower.store/veo/optimize';
+const PORTAL_LOGIN_LOG_URL = 'https://api.boxpower.store/portal/login-log';
 const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
+
+async function sendPortalLoginLog(payload){
+  try {
+    await fetch(PORTAL_LOGIN_LOG_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch (_) {}
+}
 
 async function optimizePromptVEO() {
     const inputEl = document.getElementById('veo3-input');
