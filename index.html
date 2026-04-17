@@ -628,22 +628,26 @@ async function login(){
  msgEl.textContent='Verificando acesso...';
 
  try {
-  const{data:result,error}=await sbPublic.rpc('validate_portal_login',{p_email:email,p_pin:pin});
-  if(error){
-   console.error('validate_portal_login error:', error);
-   const raw = String(error.message || error.details || error.hint || '').toLowerCase();
-   const isNetwork = raw.includes('failed to fetch') || raw.includes('network') || raw.includes('fetch');
-   const isSchema = raw.includes('relation') || raw.includes('function') || raw.includes('schema');
-   const finalMessage = isNetwork
-    ? 'Falha de conexão ao verificar acesso. Tente novamente em instantes.'
-    : isSchema
-      ? 'O portal está em atualização. Tente novamente em instantes.'
-      : 'Erro ao verificar acesso.';
+  const response = await fetch(PORTAL_LOGIN_URL, {
+   method: 'POST',
+   headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+   },
+   body: JSON.stringify({ email, pin })
+  });
+  const payload = await response.json();
+  if(!response.ok || !payload?.ok){
+   const raw = String(payload?.error || 'unknown').toLowerCase();
+   const finalMessage = raw.includes('missing_credentials')
+    ? 'Preencha e-mail e PIN corretamente.'
+    : 'Falha de conexão ao verificar acesso. Tente novamente em instantes.';
    msgEl.textContent = finalMessage;
    msgEl.className='err';
    sendPortalLoginLog({ email, status:'rpc_error', detail: raw || 'unknown', userAgent: navigator.userAgent });
    return;
   }
+  const result = payload.result;
   if(!result){msgEl.textContent='Acesso não encontrado.';msgEl.className='err';sendPortalLoginLog({ email, status:'not_found', detail:'empty_result', userAgent: navigator.userAgent });return;}
   if(result.error){
    const errs={'invalid_credentials':'PIN ou e-mail incorretos.','portal_exclusivo_boxpower':'Portal exclusivo BoxPower.'};
@@ -1212,6 +1216,7 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
 
 /* ── OTIMIZADOR VEO GEMINI ── */
 const VEO_OPTIMIZER_URL = 'https://api.boxpower.store/veo/optimize';
+const PORTAL_LOGIN_URL = 'https://api.boxpower.store/portal/login';
 const PORTAL_LOGIN_LOG_URL = 'https://api.boxpower.store/portal/login-log';
 const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
 
