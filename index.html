@@ -1186,7 +1186,37 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
 })();
 
 /* ── OTIMIZADOR VEO GEMINI ── */
-const GEMINI_API_KEY = "AIzaSyDYQu410OBEGjSbSztXSIrhMswr6cCz2kE, AIzaSyBU_giI40OBnb0ZOFvQ1gLiT14RUIpKiZM, AIzaSyAyLk-PnpimI_9_4mCUwMZdq3UQCZrb8uQ, AIzaSyAJmYNIEbisU9kehac7QPJJN-2MekSM9S8"; 
+const GEMINI_API_KEYS = [
+  'AIzaSyDYQu410OBEGjSbSztXSIrhMswr6cCz2kE',
+  'AIzaSyBU_giI40OBnb0ZOFvQ1gLiT14RUIpKiZM',
+  'AIzaSyAyLk-PnpimI_9_4mCUwMZdq3UQCZrb8uQ',
+  'AIzaSyAJmYNIEbisU9kehac7QPJJN-2MekSM9S8'
+].map(k => k.trim()).filter(Boolean);
+const GEMINI_FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+
+function buildVeoSystemPrompt(draft) {
+  return `Você é o Mike Prompt Engine, um chatbot especialista em otimização de prompts para Google Veo e Google Flow.
+Sua função é receber um rascunho em português e devolver uma versão cinematográfica, hiper clara e pronta para colar.
+
+REGRAS OBRIGATÓRIAS:
+1. Extraia a descrição visual e reescreva em inglês cinematográfico de alto nível.
+2. A parte visual deve sair em UM ÚNICO PARÁGRAFO CONTÍNUO, sem listas e sem markdown.
+3. Se houver falas ou diálogos no texto original, preserve essas falas no idioma original do usuário.
+4. Depois do parágrafo visual, pule duas linhas e coloque as falas literais, se existirem.
+5. Não use markdown, não use bullets, não use títulos.
+6. Responda somente com o prompt final otimizado.
+
+RASCUNHO ORIGINAL:\n${draft}`;
+}
+
+function classifyGeminiError(status, data) {
+  const msg = String(data?.error?.message || '').toLowerCase();
+  if (status === 429 || msg.includes('quota') || msg.includes('rate limit') || msg.includes('resource exhausted')) return 'quota';
+  if (status === 400 && (msg.includes('api key not valid') || msg.includes('api_key_invalid') || msg.includes('api key expired'))) return 'invalid_key';
+  if (status === 403 || msg.includes('permission') || msg.includes('access not configured') || msg.includes('api has not been used')) return 'forbidden';
+  if (status === 404 || msg.includes('not found') || msg.includes('is not found for api version')) return 'model';
+  return 'other';
+}
 
 async function optimizePromptVEO() {
     const inputEl = document.getElementById('veo3-input');
@@ -1199,92 +1229,62 @@ async function optimizePromptVEO() {
         showToast('Cole seu prompt/rascunho primeiro!', 'warn');
         return;
     }
-    
-    btn.innerHTML = 'Processando IA...';
-    btn.disabled = true;
 
-    if(GEMINI_API_KEY === 'SUA_API_KEY_AQUI') {
-        openPopup({ title: 'Atenção API Não Configurada', emoji: '⚠️', message: 'Sr. Administrador, por favor, configure a chave API do Google Gemini (GEMINI_API_KEY) no código fonte do portal (na linha 1060).<br><br>Feito isso os clientes poderão utilizar a ferramenta.', show_once: false });
-        btn.innerHTML = '⚡ FORMATAR ROTEIRO';
-        btn.disabled = false;
+    if(!GEMINI_API_KEYS.length) {
+        showToast('Otimizador indisponível: nenhuma chave Gemini configurada.', 'warn');
         return;
     }
 
-    const apiKeyString = GEMINI_API_KEY;
-    // Pega todas as chaves separadas por vírgula que foram jogadas lá em cima
-    const apiKeys = apiKeyString.split(',').map(k => k.trim()).filter(k => k);
-    const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
-    let finalError = '';
+    btn.innerHTML = '🤖 Pensando no melhor prompt...';
+    btn.disabled = true;
 
-    for (let i = 0; i < apiKeys.length; i++) {
-      for (let j = 0; j < fallbackModels.length; j++) {
-        const apiKey = apiKeys[i];
-        const currentModel = fallbackModels[j];
-        
+    const attemptLog = [];
+
+    for (let i = 0; i < GEMINI_API_KEYS.length; i++) {
+      for (let j = 0; j < GEMINI_FALLBACK_MODELS.length; j++) {
+        const apiKey = GEMINI_API_KEYS[i];
+        const currentModel = GEMINI_FALLBACK_MODELS[j];
+
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    contents: [{
-                        role: "user",
-                        parts: [{
-                            text: `Atue como um Engenheiro e Consultor de Prompt de Vídeo nativo de Los Angeles, Expert em "Google Veo (V3)" e "Google Flow".
-O usuário enviará um rascunho contendo descrições de cena e, ocasionalmente, falas/diálogos em português (Ex: "Fala:", "Cena:").
-SUA MISSÃO OBRIGATÓRIA:
-1. Isole a DESCRIÇÃO VISUAL DA CENA: Melhore, aplique termos cinematográficos dinâmicos e traduza TUDO RIGOROSAMENTE para o Inglês.
-2. Esta seção visual em Inglês deve ser construída como 1 ÚNICO PARÁGRAFO CONTÍNUO (Sem quebras de linha internas e sem listas).
-3. Isole as FALAS/DIÁLOGOS: MANTENHA COMO ESTÃO originais e no IDIOMA ORIGINAL (ex: Português). Não traduza as falas.
-4. ESTRUTURA FINAL EXATA:
-[Parágrafo único em Inglês descrevendo a cena visualmente com todos os detalhes]
-(pule duas linhas)
-[Falas/Diálogos literais do usuário original]
-
-NÃO use formatações Markdown (sem negritos **, sem asteriscos, sem listas). Apenas devolva o texto estruturado limpo.
-
-Roteiro fornecido:\n${draft}`
-                        }]
-                    }],
+                    contents: [{ role: 'user', parts: [{ text: buildVeoSystemPrompt(draft) }] }],
                     generationConfig: { temperature: 0.6 }
                 })
             });
 
             const data = await response.json();
-            
+
             if(!response.ok) {
-                const isQuota = response.status === 429 || (data.error && data.error.message && data.error.message.toLowerCase().includes("quota"));
-                if(isQuota) {
-                    finalError = `Cota esgotada na Chave ${i+1} usando o modelo ${currentModel}. Tentando o próximo...`;
-                    console.warn(`[VEO] API Key limit reached for ${currentModel}. Pivoting.`);
-                    continue; // Pula pra próxima
-                }
-                throw new Error(data.error?.message || 'Falha Externa na API Gemini');
+                const kind = classifyGeminiError(response.status, data);
+                attemptLog.push(`chave ${i+1} • ${currentModel} • ${kind}`);
+                continue;
             }
 
-            const optimizedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            
+            const optimizedText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n').trim();
+
             if(optimizedText) {
                 outCont.style.display = 'block';
-                // Limpa markdown de asteriscos sem esmagar as quebras de linha das Falas
-                outEl.value = optimizedText.trim().replace(/[\*\_]+/g, '');
-                showToast('As regras rigorosas foram aplicadas pelo '+currentModel+'!', 'success');
-                
-                // Deu certo! Libera botão e SAI da função pra não tentar mais.
+                outEl.value = optimizedText.replace(/[\*_]+/g, '').trim();
+                showToast('Prompt otimizado com sucesso por ' + currentModel + '!', 'success');
                 btn.innerHTML = '⚡ OTIMIZAR PROMPT';
                 btn.disabled = false;
-                return; 
-            } else {
-                throw new Error('Formato da resposta não compreendido.');
+                return;
             }
-        } catch (e) {
-            finalError = e.message;
-            // Se o erro for outro, continua tentando as outras chaves.
-        }
-      } // Fim For Models
-    } // Fim For Keys
 
-    // Se saiu dos Fors é porque TODAS as chaves e modelos deram cota excedida.
-    showToast("A IA atingiu limite de usuários diários. Tente mais tarde. " + finalError, 'warn');
+            attemptLog.push(`chave ${i+1} • ${currentModel} • resposta vazia`);
+        } catch (e) {
+            attemptLog.push(`chave ${i+1} • ${currentModel} • ${String(e.message || e)}`);
+        }
+      }
+    }
+
+    console.warn('[VEO OPTIMIZER] Falha em todas as tentativas:', attemptLog);
+    outCont.style.display = 'block';
+    outEl.value = 'Não consegui gerar o prompt agora.\n\nMotivos tentados:\n- ' + attemptLog.slice(0, 8).join('\n- ');
+    showToast('Otimizador indisponível no momento. Verifique chaves/modelos.', 'warn');
     btn.innerHTML = '⚡ OTIMIZAR PROMPT';
     btn.disabled = false;
 }
