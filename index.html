@@ -388,7 +388,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   </div>
   <div class="field-wrap">
    <div class="field-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-   <input type="number" maxlength="6" inputmode="numeric" pattern="\d{6}" id="loginPass" placeholder="PIN (6 dígitos)" autocomplete="current-password">
+   <input type="password" maxlength="6" inputmode="numeric" pattern="\d{6}" id="loginPass" placeholder="PIN (6 dígitos)" autocomplete="current-password">
    <button class="eye-btn" onclick="togglePass()"><svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
   <div class="remember-row">
@@ -620,7 +620,7 @@ function togglePass(){
 /* ── LOGIN ── */
 async function login(){
  const email=(document.getElementById('loginEmail').value||'').trim().toLowerCase();
- const pin=(document.getElementById('loginPass').value||'').trim();
+ const pin=String((document.getElementById('loginPass').value||'')).replace(/\D/g,'').trim();
  const msgEl=document.getElementById('loginMsg');
  msgEl.textContent='';msgEl.className='';
  if(!email||!pin){msgEl.textContent='Preencha e-mail e PIN.';msgEl.className='err';return;}
