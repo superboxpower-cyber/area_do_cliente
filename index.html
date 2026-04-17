@@ -648,6 +648,7 @@ async function login(){
    return;
   }
   const result = payload.result;
+  const integrity = payload.integrity || null;
   if(!result){msgEl.textContent='Acesso não encontrado.';msgEl.className='err';sendPortalLoginLog({ email, status:'not_found', detail:'empty_result', userAgent: navigator.userAgent });return;}
   if(result.error){
    const errs={'invalid_credentials':'PIN ou e-mail incorretos.','portal_exclusivo_boxpower':'Portal exclusivo BoxPower.'};
@@ -662,6 +663,9 @@ async function login(){
 
   currentClient=result;
   currentPin=pin;
+  if (integrity && integrity.cycleStatus && integrity.blocking && integrity.blocking.length) {
+   console.warn('Portal integrity warning on login:', integrity);
+  }
   sendPortalLoginLog({ email, status:'success', detail:'login_ok', userAgent: navigator.userAgent });
   await enterPortal(result);
  } catch(err) {
@@ -711,35 +715,42 @@ const PRODUCT_CATALOG = {
 async function loadProducts(client){
   const grid = document.getElementById('productsGrid');
   if(!grid) return;
-  
-  // Se não recebemos o client explícito, tentamos fazer fetch das novidades direto na base (Refresh button)
+
   if(!client && currentClient?.email) {
       try {
           const { data: updatedC } = await sbPublic.from('clients').select('*').eq('email', currentClient.email).maybeSingle();
           if(updatedC) currentClient = { ...currentClient, ...updatedC };
       } catch(e) {}
   }
-  
+
   const c = client || currentClient;
   if(!c) return;
-  
+
   grid.innerHTML = '';
-  
-  // Safely parse products if it came stringified
-  let prodsData = c.products;
-  if(typeof prodsData === 'string') {
-    try { 
-        prodsData = JSON.parse(prodsData); 
-    } catch(e) { 
-        // Se não for JSON válido (ex: "grok" solto no banco), transforma numa array de um elemento em vez de apagar
-        prodsData = [prodsData.trim()]; 
+
+  let prods = [];
+  const slotFields = [
+    { pid: c.product_id, price: c.agreed_price, due: c.due_day, slot: 1 },
+    { pid: c.product_id_2, price: c.agreed_price_2, due: c.due_day_2, slot: 2 },
+    { pid: c.product_id_3, price: c.agreed_price_3, due: c.due_day_3, slot: 3 },
+    { pid: c.product_id_4, price: c.agreed_price_4, due: c.due_day_4, slot: 4 }
+  ].filter(x => x.pid);
+
+  if (slotFields.length) {
+    prods = slotFields.map(x => x.pid);
+  } else {
+    let prodsData = c.products;
+    if(typeof prodsData === 'string') {
+      try {
+          prodsData = JSON.parse(prodsData);
+      } catch(e) {
+          prodsData = [prodsData.trim()];
+      }
     }
+    prods = Array.isArray(prodsData) ? prodsData.filter(x => x && x !== 'null') : [];
   }
-  const prods = Array.isArray(prodsData) ? prodsData.filter(x => x && x !== 'null') : [];
-  
-  // FAILSAFE: Se a inteligência (Mike) esqueceu de cadastrar o produto na array 'products',
-  // mas preencheu as colunas do grok, ejetamos o ID do Grok na marra para renderizar.
-  if (c.grok_email_1 || c.grok_email_2 || c.grok_email_3 || c.grok_pass_1 || c.grok_pass_2 || c.grok_pass_3) {
+
+  if (c.grok_email_1 || c.grok_email_2 || c.grok_email_3 || c.grok_pass_1 || c.grok_pass_2 || c.grok_pass_3 || c.product_id_2 === '033c664e-2a58-4893-919c-a84345fff0c6' || c.product_id_3 === '033c664e-2a58-4893-919c-a84345fff0c6' || c.product_id_4 === '033c664e-2a58-4893-919c-a84345fff0c6') {
       if (!prods.includes('033c664e-2a58-4893-919c-a84345fff0c6')) {
           prods.push('033c664e-2a58-4893-919c-a84345fff0c6');
       }
@@ -752,9 +763,61 @@ async function loadProducts(client){
     for (let pid of prods) {
     const meta = PRODUCT_CATALOG[pid] || { name: "Acesso Liberado", icon: "💎", color: "--green", colorRaw: "16,185,129" };
     
-    // Compute billing cycle data BEFORE building card HTML
-    const _lpRaw = c?.last_payment ? new Date(c.last_payment) : null;
-    const _dd = c?.due_day || (_lpRaw ? _lpRaw.getDate() : 25);
+    const slotIndex = (() => {
+      if (pid === c.product_id) return 1;
+      if (pid === c.product_id_2) return 2;
+      if (pid === c.product_id_3) return 3;
+      if (pid === c.product_id_4) return 4;
+      return 1;
+    })();
+
+    let _lpRaw = null;
+    let _dd = c?.due_day || 25;
+
+    if (slotIndex === 1) {
+      _lpRaw = c?.last_payment ? new Date(c.last_payment) : null;
+      _dd = c?.due_day || (_lpRaw ? _lpRaw.getDate() : 25);
+    } else {
+      const slotDue = c?.[`due_day_${slotIndex}`] || c?.due_day || 25;
+      _dd = slotDue;
+      try {
+        const { data: slotPays } = await sbPublic
+          .from('payment_history')
+          .select('payment_date')
+          .eq('client_id', c.id)
+          .eq('product_slot', slotIndex)
+          .order('payment_date', { ascending: false })
+          .limit(1);
+        if (slotPays?.length?.[0]) {}
+      } catch(e) {}
+      try {
+        const { data: slotPays } = await sbPublic
+          .from('payment_history')
+          .select('payment_date')
+          .eq('client_id', c.id)
+          .eq('product_slot', slotIndex)
+          .order('payment_date', { ascending: false })
+          .limit(1);
+        if (slotPays && slotPays.length) {
+          _lpRaw = new Date(slotPays[0].payment_date);
+        }
+      } catch(e) {}
+      if (!_lpRaw) {
+        try {
+          const { data: pidPays } = await sbPublic
+            .from('payment_history')
+            .select('payment_date')
+            .eq('client_id', c.id)
+            .eq('product_id', pid)
+            .order('payment_date', { ascending: false })
+            .limit(1);
+          if (pidPays && pidPays.length) {
+            _lpRaw = new Date(pidPays[0].payment_date);
+          }
+        } catch(e) {}
+      }
+    }
+
     let _cycleBar = '';
     if (_lpRaw) {
       const _endDate = new Date(_lpRaw);
