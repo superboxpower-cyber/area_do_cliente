@@ -673,16 +673,7 @@ async function login(){
 }
 
 async function enterPortal(client){
- // O RPC (validate_portal_login) é antigo e não retorna as novas colunas grok_email_...
- // Fazemos um fetch direto no clients para mesclar os dados reais e atualizados do banco.
- try {
-   const { data: fullData } = await sbPublic.from('clients').select('*').eq('email', client.email).maybeSingle();
-   if(fullData) {
-       client = { ...client, ...fullData };
-       currentClient = client;
-   }
- } catch(e) {}
-
+ currentClient = client;
  const nome=(client.name||client.email.split('@')[0]);
  const nomeF=nome.split(' ')[0];
  const clientId=makeClientId(client.id);
