@@ -617,6 +617,130 @@ function togglePass(){
 /* ── LEMBRAR SENHA ── */
 (function(){try{const s=localStorage.getItem('bp_creds');if(!s)return;const{e,p}=JSON.parse(s);document.getElementById('loginEmail').value=e||'';document.getElementById('loginPass').value=p||'';document.getElementById('rememberMe').checked=true;}catch(_){}})();
 
+async function fetchPortalState(email, pin){
+ const response = await fetch(PORTAL_LOGIN_URL, {
+  method: 'POST',
+  headers: {
+   'Content-Type': 'application/json',
+   'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+  },
+  body: JSON.stringify({ email, pin })
+ });
+ let payload = null;
+ try { payload = await response.json(); } catch(_) {}
+ return { response, payload };
+}
+
+async function syncCurrentPortalState(){
+ if(!currentClient?.email || !currentPin) return { ok:false, error:'missing_session' };
+ try{
+  const { response, payload } = await fetchPortalState(currentClient.email, currentPin);
+  if(!response.ok || !payload?.ok || !payload?.result || payload?.result?.error){
+   return { ok:false, error:String(payload?.error || payload?.result?.error || 'sync_failed') };
+  }
+  currentClient = { ...currentClient, ...payload.result };
+  return { ok:true, result: currentClient, integrity: payload.integrity || null };
+ }catch(err){
+  return { ok:false, error:String(err && err.message || err || 'sync_failed') };
+ }
+}
+
+function getPortalProductState(slotIndex, pid, client){
+ const list = client?.portal_products;
+ if (!Array.isArray(list)) return null;
+ return list.find(p => Number(p?.slot) === Number(slotIndex)) || list.find(p => p?.product_id === pid) || null;
+}
+
+function renderCycleCardFromState(productState){
+ const cycle = productState?.cycle || null;
+ if (cycle?.cycleStart && cycle?.cycleEnd) {
+  const _startDate = new Date(cycle.cycleStart);
+  const _endDate = new Date(cycle.cycleEnd);
+  const _startStr = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const _endStr   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const _startLbl = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
+  const _endLbl   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
+  const _pct = Math.max(0, Math.min(100, Number(cycle.progressPct || 0)));
+  const _daysLeft = Math.max(0, Number(cycle.daysLeft || 0));
+  const _expired = !!cycle.expired;
+  const _r = 27, _circ = 2*Math.PI*_r;
+  const _offs = _expired ? 0 : (_circ*(1-_pct/100)).toFixed(1);
+  return `
+      <svg width="0" height="0" style="position:absolute"><defs>
+        <linearGradient id="cycleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#10B981"/>
+          <stop offset="100%" stop-color="#8B5CF6"/>
+        </linearGradient>
+      </defs></svg>
+      <div class="cycle-card">
+        <div class="cycle-dates-col">
+          <div class="cycle-range">
+            <span>${_startStr}</span>
+            <span class="cycle-range-arrow">→</span>
+            <span>${_endStr}</span>
+          </div>
+          <div class="cycle-track-row">
+            <span class="cycle-track-label">${_startLbl}</span>
+            <div class="cycle-track">
+              <div class="cycle-fill ${_expired?'expired-fill':''}" style="width:${_expired?100:_pct}%">
+                <div class="cycle-ball ${_expired?'expired':''}"></div>
+              </div>
+            </div>
+            <span class="cycle-track-label">${_endLbl}</span>
+          </div>
+        </div>
+        <div class="cycle-ring-col">
+          <div class="cycle-ring-wrap">
+            <svg viewBox="0 0 64 64" width="64" height="64">
+              <circle class="cycle-ring-bg" cx="32" cy="32" r="${_r}"/>
+              <circle class="cycle-ring-arc ${_expired?'expired':''}" cx="32" cy="32" r="${_r}"
+                stroke-dasharray="${_circ.toFixed(1)}" stroke-dashoffset="${_offs}"/>
+            </svg>
+            <div class="cycle-ring-number">
+              <span class="cycle-ring-num ${_expired?'expired':''}">${_expired?'⛔':_daysLeft}</span>
+              <span class="cycle-ring-label">${_expired?'vencido':'dias rest.'}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+ }
+ return `
+      <div class="cycle-card cycle-card-fallback">
+        <div class="cycle-dates-col">
+          <div class="cycle-range cycle-range-fallback">
+            <span>Falha obrigatória</span>
+            <span class="cycle-range-arrow">→</span>
+            <span>Ciclo ausente</span>
+          </div>
+          <div class="cycle-track-row cycle-track-row-fallback">
+            <span class="cycle-track-label">INTEGRIDADE</span>
+            <div class="cycle-track cycle-track-fallback">
+              <div class="cycle-fill expired-fill" style="width:100%">
+                <div class="cycle-ball expired"></div>
+              </div>
+            </div>
+            <span class="cycle-track-label">SUPORTE</span>
+          </div>
+          <div style="margin-top:10px;font-size:0.78rem;color:var(--amber);font-weight:600;line-height:1.5;">
+            Produto ativo sem ciclo calculado. Isso é erro de integridade obrigatório do portal e precisa de correção no backend.
+          </div>
+        </div>
+        <div class="cycle-ring-col">
+          <div class="cycle-ring-wrap">
+            <svg viewBox="0 0 64 64" width="64" height="64">
+              <circle class="cycle-ring-bg" cx="32" cy="32" r="27"/>
+              <circle class="cycle-ring-arc expired" cx="32" cy="32" r="27"
+                stroke-dasharray="169.6" stroke-dashoffset="0"/>
+            </svg>
+            <div class="cycle-ring-number">
+              <span class="cycle-ring-num expired">!</span>
+              <span class="cycle-ring-label">erro</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+}
+
 /* ── LOGIN ── */
 async function login(){
  const email=(document.getElementById('loginEmail').value||'').trim().toLowerCase();
@@ -628,15 +752,7 @@ async function login(){
  msgEl.textContent='Verificando acesso...';
 
  try {
-  const response = await fetch(PORTAL_LOGIN_URL, {
-   method: 'POST',
-   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
-   },
-   body: JSON.stringify({ email, pin })
-  });
-  const payload = await response.json();
+  const { response, payload } = await fetchPortalState(email, pin);
   if(!response.ok || !payload?.ok){
    const raw = String(payload?.error || 'unknown').toLowerCase();
    const finalMessage = raw.includes('missing_credentials')
@@ -716,18 +832,12 @@ async function loadProducts(client){
   const grid = document.getElementById('productsGrid');
   if(!grid) return;
 
-  if(!client && currentClient?.email) {
-      try {
-          const { data: updatedC } = await sbPublic.from('clients').select('*').eq('email', currentClient.email).maybeSingle();
-          if(updatedC) currentClient = { ...currentClient, ...updatedC };
-      } catch(e) {}
-  }
-
   const c = client || currentClient;
   if(!c) return;
 
   grid.innerHTML = '';
 
+  const resolvedProducts = Array.isArray(c.portal_products) ? c.portal_products : null;
   let prods = [];
   const slotFields = [
     { pid: c.product_id, price: c.agreed_price, due: c.due_day, slot: 1 },
@@ -736,7 +846,9 @@ async function loadProducts(client){
     { pid: c.product_id_4, price: c.agreed_price_4, due: c.due_day_4, slot: 4 }
   ].filter(x => x.pid);
 
-  if (slotFields.length) {
+  if (resolvedProducts?.length) {
+    prods = resolvedProducts.map(x => x.product_id).filter(Boolean);
+  } else if (slotFields.length) {
     prods = slotFields.map(x => x.pid);
   } else {
     let prodsData = c.products;
@@ -771,108 +883,8 @@ async function loadProducts(client){
       return 1;
     })();
 
-    let _lpRaw = null;
-    let _dd = c?.due_day || 25;
-
-    if (slotIndex === 1) {
-      _lpRaw = c?.last_payment ? new Date(c.last_payment) : null;
-      _dd = c?.due_day || (_lpRaw ? _lpRaw.getDate() : 25);
-    } else {
-      const slotDue = c?.[`due_day_${slotIndex}`] || c?.due_day || 25;
-      _dd = slotDue;
-      try {
-        const { data: slotPays } = await sbPublic
-          .from('payment_history')
-          .select('payment_date')
-          .eq('client_id', c.id)
-          .eq('product_slot', slotIndex)
-          .order('payment_date', { ascending: false })
-          .limit(1);
-        if (slotPays?.length?.[0]) {}
-      } catch(e) {}
-      try {
-        const { data: slotPays } = await sbPublic
-          .from('payment_history')
-          .select('payment_date')
-          .eq('client_id', c.id)
-          .eq('product_slot', slotIndex)
-          .order('payment_date', { ascending: false })
-          .limit(1);
-        if (slotPays && slotPays.length) {
-          _lpRaw = new Date(slotPays[0].payment_date);
-        }
-      } catch(e) {}
-      if (!_lpRaw) {
-        try {
-          const { data: pidPays } = await sbPublic
-            .from('payment_history')
-            .select('payment_date')
-            .eq('client_id', c.id)
-            .eq('product_id', pid)
-            .order('payment_date', { ascending: false })
-            .limit(1);
-          if (pidPays && pidPays.length) {
-            _lpRaw = new Date(pidPays[0].payment_date);
-          }
-        } catch(e) {}
-      }
-    }
-
-    let _cycleBar = '';
-    if (_lpRaw) {
-      const _endDate = new Date(_lpRaw);
-      _endDate.setMonth(_endDate.getMonth() + 1);
-      _endDate.setDate(_dd);
-      const _now = new Date();
-      const _totalMs = _endDate - _lpRaw;
-      const _pct = Math.max(0, Math.min(100, ((_now - _lpRaw) / _totalMs) * 100));
-      const _daysLeft = Math.max(0, Math.ceil((_endDate - _now) / 86400000));
-      const _expired = _now > _endDate;
-      const _startStr = _lpRaw.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      const _endStr   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      const _startLbl = _lpRaw.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
-      const _endLbl   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
-      const _r = 27, _circ = 2*Math.PI*_r;
-      const _offs = _expired ? 0 : (_circ*(1-_pct/100)).toFixed(1);
-      _cycleBar = `
-      <svg width="0" height="0" style="position:absolute"><defs>
-        <linearGradient id="cycleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#10B981"/>
-          <stop offset="100%" stop-color="#8B5CF6"/>
-        </linearGradient>
-      </defs></svg>
-      <div class="cycle-card">
-        <div class="cycle-dates-col">
-          <div class="cycle-range">
-            <span>${_startStr}</span>
-            <span class="cycle-range-arrow">→</span>
-            <span>${_endStr}</span>
-          </div>
-          <div class="cycle-track-row">
-            <span class="cycle-track-label">${_startLbl}</span>
-            <div class="cycle-track">
-              <div class="cycle-fill ${_expired?'expired-fill':''}" style="width:${_expired?100:_pct}%">
-                <div class="cycle-ball ${_expired?'expired':''}"></div>
-              </div>
-            </div>
-            <span class="cycle-track-label">${_endLbl}</span>
-          </div>
-        </div>
-        <div class="cycle-ring-col">
-          <div class="cycle-ring-wrap">
-            <svg viewBox="0 0 64 64" width="64" height="64">
-              <circle class="cycle-ring-bg" cx="32" cy="32" r="${_r}"/>
-              <circle class="cycle-ring-arc ${_expired?'expired':''}" cx="32" cy="32" r="${_r}"
-                stroke-dasharray="${_circ.toFixed(1)}" stroke-dashoffset="${_offs}"/>
-            </svg>
-            <div class="cycle-ring-number">
-              <span class="cycle-ring-num ${_expired?'expired':''}">${_expired?'⛔':_daysLeft}</span>
-              <span class="cycle-ring-label">${_expired?'vencido':'dias rest.'}</span>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }
+    const portalProduct = getPortalProductState(slotIndex, pid, c);
+    const _cycleBar = renderCycleCardFromState(portalProduct);
 
     html += `
     <div class="card cred-card" style="margin-bottom:0;">
@@ -1178,30 +1190,25 @@ async function revealPassword(){
    toast('Faça login novamente.','warn');
    return;
   }
-  const { data, error } = await sbPublic.rpc('validate_portal_login', {
-   p_email: currentClient.email,
-   p_pin: currentPin
-  });
-
-  if(error || !data || data.error){
+  const syncRes = await syncCurrentPortalState();
+  if(!syncRes.ok || !currentClient){
    toast('Erro ao liberar. Faça login novamente.','warn');
    return;
   }
 
-  // Block reveal if subscription expired
-  const _revLp = currentClient?.last_payment ? new Date(currentClient.last_payment) : null;
-  if (_revLp) {
-    const _revEnd = new Date(_revLp);
-    _revEnd.setMonth(_revEnd.getMonth() + 1);
-    _revEnd.setDate(currentClient?.due_day || _revLp.getDate());
-    if (new Date() > _revEnd) {
-      toast('Assinatura vencida. Renove para liberar o acesso.', 'warn');
-      if (rb) rb.disabled = false;
-      return;
-    }
+  const boxProduct = getPortalProductState(1, '1c13544a-1435-4071-a10a-566e80cad327', currentClient);
+  if (boxProduct?.cycle?.expired) {
+    toast('Assinatura vencida. Renove para liberar o acesso.', 'warn');
+    if (rb) rb.disabled = false;
+    return;
   }
-  const senha = data.adspower_password || currentClient?.adspower_password || '';
-  const perfil = data.adspower_login || currentClient?.adspower_login || '';
+  if (boxProduct && boxProduct.missing_cycle) {
+    toast('Produto ativo sem ciclo válido. Corrija a integridade do portal.', 'warn');
+    if (rb) rb.disabled = false;
+    return;
+  }
+  const senha = currentClient?.adspower_password || '';
+  const perfil = currentClient?.adspower_login || '';
 
   if(!senha){
    toast('Senha ainda não disponível. Atualize a página (F5) e tente novamente.','warn');
@@ -1232,7 +1239,8 @@ async function revealPassword(){
 /* ── REFRESH ── */
 async function refreshPortal(){
  ['refreshBtn','refreshBtnMobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.classList.add('spin');});
- await Promise.all([loadProducts(),loadPayments(),loadMessages()]);
+ await syncCurrentPortalState().catch(()=>null);
+ await Promise.all([loadProducts(currentClient),loadPayments(currentClient),loadMessages()]);
  setTimeout(()=>{['refreshBtn','refreshBtnMobile'].forEach(id=>{const b=document.getElementById(id);if(b)b.classList.remove('spin');});showToast('Portal atualizado!');},700);
 }
 
