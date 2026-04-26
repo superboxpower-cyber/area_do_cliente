@@ -1263,11 +1263,11 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
   if(saved){
    const{e,p}=JSON.parse(saved);
    if(e&&p&&/^\d{6}$/.test(p)){
-    const{data:result,error}=await sbPublic.rpc('validate_portal_login',{p_email:e,p_pin:p});
-    if(!error&&result&&!result.error){
-     currentClient=result;
+    const { response, payload } = await fetchPortalState(e, p);
+    if(response.ok && payload?.ok && payload?.result && !payload?.result?.error){
+     currentClient=payload.result;
      currentPin=p;
-     await enterPortal(result);return;
+     await enterPortal(payload.result);return;
     }
     localStorage.removeItem('bp_creds');
    }
