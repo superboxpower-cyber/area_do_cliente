@@ -802,7 +802,28 @@ async function enterPortal(client){
  setEl('sideUserEmail',client.email||'');
  document.getElementById('loginScreen').style.display='none';
  showToast('Bem-vindo, '+nomeF+'!');
- await Promise.all([loadProducts(client),loadPayments(client),loadMessages(),loadPopup()]);
+
+ const loaders = [
+  ['loadProducts', () => loadProducts(client)],
+  ['loadPayments', () => loadPayments(client)],
+  ['loadMessages', () => loadMessages()],
+  ['loadPopup', () => loadPopup()]
+ ];
+
+ const results = await Promise.allSettled(
+  loaders.map(([name, fn]) => Promise.resolve().then(fn).catch(err => {
+   console.warn('[portal]', name, 'failed:', err);
+   throw err;
+  }))
+ );
+
+ const failed = results
+  .map((r, i) => ({ r, name: loaders[i][0] }))
+  .filter(x => x.r.status === 'rejected');
+
+ if (failed.length) {
+  console.warn('[portal] partial render after login:', failed.map(f => f.name));
+ }
 }
 
 /* ── LOGOUT ── */
