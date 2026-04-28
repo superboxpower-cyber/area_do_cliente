@@ -783,12 +783,44 @@ async function login(){
    console.warn('Portal integrity warning on login:', integrity);
   }
   sendPortalLoginLog({ email, status:'success', detail:'login_ok', userAgent: navigator.userAgent });
-  await enterPortal(result);
+
+  try {
+   await enterPortal(result);
+  } catch (renderErr) {
+   console.error('enterPortal render fallback:', renderErr);
+   sendPortalLoginLog({ email, status:'render_fallback', detail:String(renderErr && renderErr.message || renderErr || 'unknown'), userAgent: navigator.userAgent });
+   await forcePortalEntry(result);
+  }
  } catch(err) {
   console.error('login unexpected error:', err);
   msgEl.textContent='Falha inesperada ao entrar. Tente novamente.';
   msgEl.className='err';
   sendPortalLoginLog({ email, status:'unexpected_error', detail:String(err && err.message || err || 'unknown'), userAgent: navigator.userAgent });
+ }
+}
+
+async function forcePortalEntry(client){
+ currentClient = client || currentClient || {};
+ const nomeBase = currentClient.name || currentClient.email || 'Cliente';
+ const nomeF = String(nomeBase).split(' ')[0].split('@')[0] || 'Cliente';
+ const clientId = makeClientId(currentClient.id || '0000');
+ setEl('sideUserName', nomeF);
+ setEl('sideUserId', '#'+clientId);
+ setEl('sideUserEmail', currentClient.email || '—');
+ const loginScreen = document.getElementById('loginScreen');
+ if(loginScreen) loginScreen.style.display='none';
+ showToast('Bem-vindo, '+nomeF+'!');
+ showSection('produtos');
+
+ const safeCalls = [
+  ['loadProducts', () => loadProducts(currentClient)],
+  ['loadPayments', () => loadPayments(currentClient)],
+  ['loadMessages', () => loadMessages()],
+  ['loadPopup', () => loadPopup()]
+ ];
+
+ for (const [name, fn] of safeCalls) {
+  try { await fn(); } catch (err) { console.warn('[portal][fallback]', name, 'failed:', err); }
  }
 }
 
