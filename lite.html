@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoxPower Lite</title>
+  <style>
+    :root{--bg:#071018;--card:#101827;--line:#223047;--text:#eef2ff;--muted:#9fb0d0;--green:#10b981;--violet:#8b5cf6;--red:#f87171}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(circle at top left,#0b2a2a,transparent 35%),linear-gradient(135deg,#050814,#0a0f1f);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{width:100%;max-width:420px;background:rgba(16,24,39,.96);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+    h1{font-size:28px;margin:0 0 6px;text-align:center} p{margin:0 0 18px;text-align:center;color:var(--muted)}
+    label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+    input{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:#0b1220;color:var(--text);padding:0 14px;font-size:16px}
+    button{width:100%;height:48px;border:0;border-radius:14px;background:linear-gradient(90deg,var(--green),var(--violet));color:white;font-weight:700;font-size:16px;cursor:pointer;margin-top:16px}
+    .msg{margin-top:12px;min-height:20px;font-size:14px;text-align:center}.err{color:var(--red)}.ok{color:#86efac}
+    .panel{margin-top:18px;border-top:1px solid var(--line);padding-top:18px;display:none}
+    .box{background:#0b1220;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px}
+    .row{margin:8px 0}.k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all}
+    .cta{display:inline-block;margin-top:14px;text-decoration:none;color:white;background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>BoxPower Lite</h1>
+    <p>Entrada simplificada para quando o portal principal falhar.</p>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" />
+    <label for="pin">PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" />
+    <button id="go" onclick="login()">Entrar</button>
+    <div id="msg" class="msg"></div>
+
+    <div id="panel" class="panel">
+      <div class="box">
+        <div class="row"><div class="k">Cliente</div><div class="v" id="clientName">-</div></div>
+        <div class="row"><div class="k">Email do portal</div><div class="v" id="portalEmail">-</div></div>
+        <div class="row"><div class="k">Status do ciclo</div><div class="v" id="cycleStatus">-</div></div>
+      </div>
+      <div id="veoBox" class="box" style="display:none">
+        <div class="row"><div class="k">Conta VEO</div><div class="v" id="veoEmail">-</div></div>
+        <div class="row"><div class="k">Senha VEO</div><div class="v" id="veoPass">-</div></div>
+        <a class="cta" href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">Abrir Flow</a>
+      </div>
+      <div id="boxpowerBox" class="box" style="display:none">
+        <div class="row"><div class="k">Login AdsPower</div><div class="v" id="adsLogin">-</div></div>
+        <div class="row"><div class="k">Senha AdsPower</div><div class="v" id="adsPass">-</div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const PORTAL_LOGIN_URL = 'https://api.boxpower.store/portal/login';
+    const TOKEN = 'boxpower-veo-optimizer-2026';
+    function setMsg(text, cls=''){ const el=document.getElementById('msg'); el.textContent=text; el.className='msg '+cls; }
+    async function login(){
+      const email=(document.getElementById('email').value||'').trim().toLowerCase();
+      const pin=String(document.getElementById('pin').value||'').replace(/\D/g,'').trim();
+      if(!email||!pin){ setMsg('Preencha email e PIN.','err'); return; }
+      setMsg('Verificando acesso...');
+      const btn=document.getElementById('go'); btn.disabled=true;
+      try{
+        const res=await fetch(PORTAL_LOGIN_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({email,pin})});
+        const payload=await res.json().catch(()=>null);
+        if(!res.ok||!payload?.ok||!payload?.result||payload?.result?.error){
+          const err = payload?.result?.error || payload?.error || 'Falha no acesso';
+          setMsg(String(err)==='invalid_credentials'?'Email ou PIN incorretos.':'Falha ao verificar acesso.','err');
+          return;
+        }
+        const c=payload.result; const integ=payload.integrity||{};
+        document.getElementById('panel').style.display='block';
+        document.getElementById('clientName').textContent=c.name||'-';
+        document.getElementById('portalEmail').textContent=c.email||email;
+        document.getElementById('cycleStatus').textContent=integ.cycleStatus||c.portal_cycle_status||'ativo';
+        const veo = c.veo3_email || c.product_id==='01ccb898-f88f-4bd3-8bd9-33650abf961c';
+        const box = c.product_id==='1c13544a-1435-4071-a10a-566e80cad327';
+        if(veo){
+          document.getElementById('veoBox').style.display='block';
+          document.getElementById('veoEmail').textContent=c.veo3_email||'-';
+          document.getElementById('veoPass').textContent=c.veo3_password||'-';
+        }
+        if(box){
+          document.getElementById('boxpowerBox').style.display='block';
+          document.getElementById('adsLogin').textContent=c.adspower_login||'-';
+          document.getElementById('adsPass').textContent=c.adspower_password||'-';
+        }
+        setMsg('Acesso liberado com sucesso.','ok');
+      }catch(e){
+        setMsg('Falha de conexão. Tente novamente.','err');
+      } finally { btn.disabled=false; }
+    }
+  </script>
+</body>
+</html>
