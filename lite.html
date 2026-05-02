@@ -70,8 +70,13 @@
         document.getElementById('clientName').textContent=c.name||'-';
         document.getElementById('portalEmail').textContent=c.email||email;
         document.getElementById('cycleStatus').textContent=integ.cycleStatus||c.portal_cycle_status||'ativo';
-        const veo = c.veo3_email || c.product_id==='01ccb898-f88f-4bd3-8bd9-33650abf961c';
-        const box = c.product_id==='1c13544a-1435-4071-a10a-566e80cad327';
+        const productStates = Array.isArray(c.portal_products)?c.portal_products:[];
+        const veoState = productStates.find(p=>p.product_id==='01ccb898-f88f-4bd3-8bd9-33650abf961c');
+        const boxState = productStates.find(p=>p.product_id==='1c13544a-1435-4071-a10a-566e80cad327');
+        const veoActive = !!(veoState && veoState.cycle && !veoState.cycle.expired);
+        const boxActive = !!(boxState && boxState.cycle && !boxState.cycle.expired);
+        const veo = !!c.veo3_email && veoActive;
+        const box = !!c.adspower_login && boxActive;
         if(veo){
           document.getElementById('veoBox').style.display='block';
           document.getElementById('veoEmail').textContent=c.veo3_email||'-';

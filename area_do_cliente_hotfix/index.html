@@ -439,6 +439,11 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
     <span class="nav-label">Avisos</span>
     <span class="nav-badge" id="msgBadge" style="display:none;">0</span>
    </a>
+   <a class="nav-item" id="nav-tutoriais" onclick="showSection('tutoriais')">
+    <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+    <span class="nav-label">Tutoriais</span>
+    <span class="nav-badge" style="display:inline;">NEW</span>
+   </a>
    <a class="nav-item" id="nav-otimizador" onclick="showSection('otimizador')">
     <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
     <span class="nav-label">Otimizador de Prompt</span>
@@ -525,6 +530,86 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
       <div style="font-size:0.7rem;color:var(--muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">Todos os avisos</div>
       <div class="msg-list" id="msgList"><div style="color:var(--muted);font-size:0.8rem;padding:20px 0;">Carregando...</div></div>
      </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- SECTION: TUTORIAIS -->
+  <div class="section" id="section-tutoriais">
+   <div class="section-title">Central de Tutoriais</div>
+   <div class="section-sub">Aprenda a usar suas ferramentas com vídeos rápidos, diretos e organizados por produto.</div>
+
+   <div class="card tutorial-shelf">
+    <div class="tutorial-shelf-head">
+     <div>
+      <div class="tutorial-shelf-title">Comece por aqui</div>
+      <div class="tutorial-shelf-sub">Os vídeos mais importantes para ativação e primeiros passos.</div>
+     </div>
+    </div>
+    <div class="tutorial-grid">
+     <div class="tutorial-card">
+      <div class="tutorial-thumb">🔓</div>
+      <div class="tutorial-tags"><span class="tutorial-tag primary">Importante</span><span class="tutorial-tag">Iniciante</span></div>
+      <div class="tutorial-card-title">Como acessar o portal pela primeira vez</div>
+      <div class="tutorial-card-desc">Vídeo ideal para quem acabou de entrar e quer localizar acessos, PIN e produtos liberados.</div>
+      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
+     </div>
+     <div class="tutorial-card">
+      <div class="tutorial-thumb">📱</div>
+      <div class="tutorial-tags"><span class="tutorial-tag">Dica rápida</span></div>
+      <div class="tutorial-card-title">Como usar no celular sem erro</div>
+      <div class="tutorial-card-desc">Atalho rápido mostrando login, cópia de credenciais e navegação no celular.</div>
+      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
+     </div>
+     <div class="tutorial-card">
+      <div class="tutorial-thumb">🛟</div>
+      <div class="tutorial-tags"><span class="tutorial-tag">Suporte</span></div>
+      <div class="tutorial-card-title">Erros comuns e como resolver</div>
+      <div class="tutorial-card-desc">Checklist simples para cliente se virar antes de chamar suporte.</div>
+      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="card tutorial-shelf">
+    <div class="tutorial-shelf-head">
+     <div>
+      <div class="tutorial-shelf-title">BoxPower</div>
+      <div class="tutorial-shelf-sub">Tutorial de uso do portal principal e recursos da conta.</div>
+     </div>
+    </div>
+    <div class="tutorial-grid">
+     <div class="tutorial-card"><div class="tutorial-thumb">📦</div><div class="tutorial-tags"><span class="tutorial-tag primary">Iniciante</span></div><div class="tutorial-card-title">Como acessar o BoxPower</div><div class="tutorial-card-desc">Passo a passo da entrada no portal e visualização dos recursos liberados.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">⚙️</div><div class="tutorial-tags"><span class="tutorial-tag">Intermediário</span></div><div class="tutorial-card-title">Configuração básica e boas práticas</div><div class="tutorial-card-desc">Organização inicial para o cliente aproveitar melhor a plataforma.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">🚀</div><div class="tutorial-tags"><span class="tutorial-tag">Avançado</span></div><div class="tutorial-card-title">Fluxo de uso no dia a dia</div><div class="tutorial-card-desc">Exemplo rápido de como extrair mais valor do produto logo no primeiro uso.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+    </div>
+   </div>
+
+   <div class="card tutorial-shelf">
+    <div class="tutorial-shelf-head">
+     <div>
+      <div class="tutorial-shelf-title">VEO3</div>
+      <div class="tutorial-shelf-sub">Acesso, uso correto da conta e melhores práticas para evitar bloqueios.</div>
+     </div>
+    </div>
+    <div class="tutorial-grid">
+     <div class="tutorial-card"><div class="tutorial-thumb">🎬</div><div class="tutorial-tags"><span class="tutorial-tag primary">Importante</span></div><div class="tutorial-card-title">Como liberar e acessar o VEO3</div><div class="tutorial-card-desc">Mostra o caminho de liberação, cópia das credenciais e entrada correta.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">🧠</div><div class="tutorial-tags"><span class="tutorial-tag">Prompt</span></div><div class="tutorial-card-title">Como montar prompts melhores</div><div class="tutorial-card-desc">Tutorial rápido para o cliente sair do básico e gerar vídeos mais consistentes.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">🛡️</div><div class="tutorial-tags"><span class="tutorial-tag">Segurança</span></div><div class="tutorial-card-title">Como evitar uso indevido e bloqueios</div><div class="tutorial-card-desc">Explica as regras práticas de uso para não comprometer o acesso compartilhado.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+    </div>
+   </div>
+
+   <div class="card tutorial-shelf">
+    <div class="tutorial-shelf-head">
+     <div>
+      <div class="tutorial-shelf-title">Grok & ChatGPT</div>
+      <div class="tutorial-shelf-sub">Tutoriais de IA conversacional, login e uso prático.</div>
+     </div>
+    </div>
+    <div class="tutorial-grid">
+     <div class="tutorial-card"><div class="tutorial-thumb">⚡</div><div class="tutorial-tags"><span class="tutorial-tag primary">Grok</span></div><div class="tutorial-card-title">Primeiro acesso ao Grok</div><div class="tutorial-card-desc">Ensina como usar uma das credenciais vinculadas e começar sem travar.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">🤖</div><div class="tutorial-tags"><span class="tutorial-tag primary">ChatGPT</span></div><div class="tutorial-card-title">Como usar no dia a dia</div><div class="tutorial-card-desc">Guia prático para prompts, pesquisa, escrita e suporte com IA.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
+     <div class="tutorial-card"><div class="tutorial-thumb">💡</div><div class="tutorial-tags"><span class="tutorial-tag">Produtividade</span></div><div class="tutorial-card-title">Prompts prontos para tarefas comuns</div><div class="tutorial-card-desc">Coleção de usos rápidos para acelerar o resultado do cliente.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
     </div>
    </div>
   </div>
@@ -656,10 +741,10 @@ function renderCycleCardFromState(productState){
  if (cycle?.cycleStart && cycle?.cycleEnd) {
   const _startDate = new Date(cycle.cycleStart);
   const _endDate = new Date(cycle.cycleEnd);
-  const _startStr = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-  const _endStr   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-  const _startLbl = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
-  const _endLbl   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).toUpperCase();
+  const _startStr = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit', timeZone:'UTC'});
+  const _endStr   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit', timeZone:'UTC'});
+  const _startLbl = _startDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short', timeZone:'UTC'}).toUpperCase();
+  const _endLbl   = _endDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short', timeZone:'UTC'}).toUpperCase();
   const _pct = Math.max(0, Math.min(100, Number(cycle.progressPct || 0)));
   const _daysLeft = Math.max(0, Number(cycle.daysLeft || 0));
   const _expired = !!cycle.expired;
@@ -938,6 +1023,13 @@ async function loadProducts(client){
 
     const portalProduct = getPortalProductState(slotIndex, pid, c);
     const _cycleBar = renderCycleCardFromState(portalProduct);
+    const _isExpiredProduct = !!portalProduct?.cycle?.expired;
+    const _isBlockedProduct = _isExpiredProduct || !!portalProduct?.missing_cycle;
+    const _subtitle = portalProduct?.missing_cycle ? 'Produto bloqueado' : (_isExpiredProduct ? 'Produto vencido' : 'Produto ativo');
+    const _statusLabel = portalProduct?.missing_cycle ? 'BLOQUEADO' : (_isExpiredProduct ? 'VENCIDO' : 'ATIVO');
+    const _statusStyle = _isBlockedProduct
+      ? 'color:var(--red);background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);'
+      : `color:var(${meta.color});background:rgba(${meta.colorRaw},0.08);border-color:rgba(${meta.colorRaw},0.2);`;
 
     html += `
     <div class="card cred-card" style="margin-bottom:0;">
@@ -947,33 +1039,43 @@ async function loadProducts(client){
       <div class="cred-icon" style="background:linear-gradient(135deg,rgba(${meta.colorRaw},0.2),rgba(${meta.colorRaw},0.05));border-color:rgba(${meta.colorRaw},0.3);">${meta.icon}</div>
              <div>
         <div class="cred-title">${meta.name}</div>
-        <div class="cred-subtitle">Produto Ativo</div>
+        <div class="cred-subtitle">${_subtitle}</div>
         
        </div>
-      <div class="cred-status" style="color:var(${meta.color});background:rgba(${meta.colorRaw},0.08);border-color:rgba(${meta.colorRaw},0.2);">ATIVO</div>
+      <div class="cred-status" style="${_statusStyle}">${_statusLabel}</div>
      </div>`;
      
      if (pid === '1c13544a-1435-4071-a10a-566e80cad327') {
        // BOXPOWER SPECIFIC ADSPOWER FIELDS
-       html += `
-       <div class="cred-fields">
-        <div class="cred-field full">
-         <div class="cred-field-label">Email do ADSPOWER</div>
-         <div class="cred-field-row">
-          <div class="cred-val" id="ads-profile-id">${client.adspower_login||''}</div>
-         </div>
-        </div>
-        <div class="cred-field full">
-         <div class="cred-field-label">Senha do ADSPOWER</div>
-         <div class="cred-field-row">
-          <div class="cred-val"><span class="dots-anim" id="dots-view">• • • • • • • • •</span><span id="pass-val" style="display:none;">${client.adspower_password||''}</span></div>
-          <div class="field-actions">
-           <span class="reveal-timer" id="timer-lbl"></span>
-           <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+       if (_isBlockedProduct) {
+         html += `
+         <div class="cred-fields">
+           <div class="cred-field full" style="text-align:center;padding:24px;">
+             <div style="font-size:0.88rem;color:var(--red);font-weight:700;margin-bottom:10px;">${portalProduct?.missing_cycle ? 'Acesso bloqueado' : 'Assinatura vencida'}</div>
+             <div style="font-size:0.78rem;color:var(--muted2);line-height:1.6;">${portalProduct?.missing_cycle ? 'Este produto está sem ciclo válido no portal. Corrija a integridade antes de liberar as credenciais.' : 'As credenciais do BoxPower ficam bloqueadas após o vencimento. Renove para voltar a liberar o acesso.'}</div>
+           </div>
+         </div>`;
+       } else {
+         html += `
+         <div class="cred-fields">
+          <div class="cred-field full">
+           <div class="cred-field-label">Email do ADSPOWER</div>
+           <div class="cred-field-row">
+            <div class="cred-val" id="ads-profile-id">${client.adspower_login||''}</div>
+           </div>
           </div>
-         </div>
-        </div>
-       </div>`;
+          <div class="cred-field full">
+           <div class="cred-field-label">Senha do ADSPOWER</div>
+           <div class="cred-field-row">
+            <div class="cred-val"><span class="dots-anim" id="dots-view">• • • • • • • • •</span><span id="pass-val" style="display:none;">${client.adspower_password||''}</span></div>
+            <div class="field-actions">
+             <span class="reveal-timer" id="timer-lbl"></span>
+             <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+            </div>
+           </div>
+          </div>
+         </div>`;
+       }
      } else if (pid === '01ccb898-f88f-4bd3-8bd9-33650abf961c') {
        // VEO3 SHARED — credenciais do Google Flow
        const veoEmail = c.veo3_email || '';
@@ -981,38 +1083,42 @@ async function loadProducts(client){
        // Force cache-bust on currentClient re-read
        const _veoSafe = veoEmail || (currentClient?.veo3_email) || '';
        const _veoPassSafe = veoPass || (currentClient?.veo3_password) || '';
-       html += `
-       <div class="cred-fields">
-         <div class="cred-field full">
-           <div class="cred-field-label">Email da conta Google (Flow)</div>
-           <div class="cred-field-row">
-             <div class="cred-val" id="veo3-email-val">${_veoSafe || '—'}</div>
-             ${_veoSafe ? `<button class="btn-reveal" style="margin-left:8px;padding:0 10px;font-size:0.75rem;" onclick="navigator.clipboard.writeText('${_veoSafe}');showToast('Email copiado!')">Copiar</button>` : ''}
+       if (_isBlockedProduct) {
+         html += `
+         <div class="cred-fields">
+           <div class="cred-field full" style="text-align:center;padding:24px;">
+             <div style="font-size:0.88rem;color:var(--red);font-weight:700;margin-bottom:10px;">${portalProduct?.missing_cycle ? 'Acesso bloqueado' : 'Assinatura vencida'}</div>
+             <div style="font-size:0.78rem;color:var(--muted2);line-height:1.6;">${portalProduct?.missing_cycle ? 'Este produto está sem ciclo válido no portal. Corrija a integridade antes de liberar as credenciais.' : 'As credenciais do VEO3 ficam bloqueadas após o vencimento. Renove para voltar a liberar o acesso.'}</div>
            </div>
-         </div>
-         <div class="cred-field full">
-           <div class="cred-field-label">Senha da conta Google (Flow)</div>
-           <div class="cred-field-row">
-             <div class="cred-val"><span class="dots-anim" id="veo3-dots">• • • • • • • •</span><span id="veo3-pass-val" style="display:none;">${_veoPassSafe}</span></div>
-             <div class="field-actions">
-               <button class="btn-reveal" id="veo3-copy-pass" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('veo3-pass-val').textContent.trim());showToast('Senha copiada!')">Copiar</button>
-               <button class="btn-reveal" id="veo3-reveal-btn" onclick="
-                 const pv=document.getElementById('veo3-pass-val');
-                 const dt=document.getElementById('veo3-dots');
-                 const cp=document.getElementById('veo3-copy-pass');
-                 pv.style.display='inline';dt.style.display='none';this.style.display='none';if(cp)cp.style.display='inline-flex';
-                 setTimeout(()=>{pv.style.display='none';dt.style.display='inline';this.style.display='inline-flex';if(cp)cp.style.display='none';},15000);
-               "><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+         </div>`;
+       } else {
+         html += `
+         <div class="cred-fields">
+           <div class="cred-field full">
+             <div class="cred-field-label">Email da conta Google (Flow)</div>
+             <div class="cred-field-row">
+               <div class="cred-val" id="veo3-email-val">${_veoSafe || '—'}</div>
+               ${_veoSafe ? `<button class="btn-reveal" style="margin-left:8px;padding:0 10px;font-size:0.75rem;" onclick="navigator.clipboard.writeText('${_veoSafe}');showToast('Email copiado!')">Copiar</button>` : ''}
              </div>
            </div>
-         </div>
-         <div class="cred-field full" style="text-align:center;padding-top:4px;">
-           <div style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Use sempre em aba anônima • Modelo: <strong>Veo 3.1 – Fast [Lower Priority]</strong></div>
-           <a href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">
-             <button class="btn-login" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;">🚀 Ir para o Flow</button>
-           </a>
-         </div>
-       </div>`;
+           <div class="cred-field full">
+             <div class="cred-field-label">Senha da conta Google (Flow)</div>
+             <div class="cred-field-row">
+               <div class="cred-val"><span class="dots-anim" id="veo3-dots">• • • • • • • •</span><span id="veo3-pass-val" style="display:none;">${_veoPassSafe}</span></div>
+               <div class="field-actions">
+                 <button class="btn-reveal" id="veo3-copy-pass" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('veo3-pass-val').textContent.trim());showToast('Senha copiada!')">Copiar</button>
+                 <button class="btn-reveal" id="veo3-reveal-btn" onclick="revealPortalCredential({ kind:'veo3', productId:'01ccb898-f88f-4bd3-8bd9-33650abf961c', slotIndex:${slotIndex}, emailFieldId:'veo3-email-val', passFieldId:'veo3-pass-val', dotsFieldId:'veo3-dots', copyBtnId:'veo3-copy-pass', buttonId:'veo3-reveal-btn' })"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+               </div>
+             </div>
+           </div>
+           <div class="cred-field full" style="text-align:center;padding-top:4px;">
+             <div style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Use sempre em aba anônima • Modelo: <strong>Veo 3.1 – Fast [Lower Priority]</strong></div>
+             <a href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">
+               <button class="btn-login" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;">🚀 Ir para o Flow</button>
+             </a>
+           </div>
+         </div>`;
+       }
 
      } else if (pid === '8024dd7f-6df3-4eb7-9567-42c7198be3b7') {
        // CAPCUT PRO
@@ -1055,13 +1161,19 @@ async function loadProducts(client){
      ) {
        // GROK PREMIUM (ATÉ 3 CREDENCIAIS)
        html += '<div class="cred-fields">';
-       let hasAnyCred = false;
-       for (let i = 1; i <= 3; i++) {
-         const gm = c[`grok_email_${i}`] || currentClient?.[`grok_email_${i}`] || '';
-         const gp = c[`grok_pass_${i}`] || currentClient?.[`grok_pass_${i}`] || '';
-         const displayEmail = gm ? gm : 'Aguardando Atribuição...';
-          const passPlaceholder = gp ? '• • • • • • • •' : '...';
-          if (true) {
+       if (_isBlockedProduct) {
+         html += `
+         <div class="cred-field full" style="text-align:center;padding:24px;">
+           <div style="font-size:0.88rem;color:var(--red);font-weight:700;margin-bottom:10px;">${portalProduct?.missing_cycle ? 'Acesso bloqueado' : 'Assinatura vencida'}</div>
+           <div style="font-size:0.78rem;color:var(--muted2);line-height:1.6;">${portalProduct?.missing_cycle ? 'Este produto está sem ciclo válido no portal. Corrija a integridade antes de liberar as credenciais.' : 'As credenciais do Grok ficam bloqueadas após o vencimento. Renove para voltar a liberar o acesso.'}</div>
+         </div>`;
+       } else {
+         let hasAnyCred = false;
+         for (let i = 1; i <= 3; i++) {
+           const gm = c[`grok_email_${i}`] || currentClient?.[`grok_email_${i}`] || '';
+           const gp = c[`grok_pass_${i}`] || currentClient?.[`grok_pass_${i}`] || '';
+           const displayEmail = gm ? gm : 'Aguardando Atribuição...';
+           const passPlaceholder = gp ? '• • • • • • • •' : '...';
            hasAnyCred = true;
            html += `
              <div class="cred-field full" style="margin-bottom:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
@@ -1081,28 +1193,22 @@ async function loadProducts(client){
                      <div class="cred-val"><span class="dots-anim" id="grok-dots-${i}" style="${!gp ? 'letter-spacing:normal;color:var(--muted);font-style:italic;' : ''}">${passPlaceholder}</span><span id="grok-pass-val-${i}" style="display:none;">${gp}</span></div>
                      <div class="field-actions">
                          <button class="btn-reveal" id="grok-copy-pass-${i}" style="display:none;" onclick="navigator.clipboard.writeText(document.getElementById('grok-pass-val-${i}').textContent.trim());showToast('Senha copiada!')">Copiar</button>
-                         <button class="btn-reveal" id="grok-reveal-btn-${i}" onclick="
-                             const pv=document.getElementById('grok-pass-val-${i}');
-                             const dt=document.getElementById('grok-dots-${i}');
-                             const cp=document.getElementById('grok-copy-pass-${i}');
-                             pv.style.display='inline';dt.style.display='none';this.style.display='none';if(cp)cp.style.display='inline-flex';
-                             setTimeout(()=>{pv.style.display='none';dt.style.display='inline';this.style.display='inline-flex';if(cp)cp.style.display='none';},15000);
-                         "><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+                         <button class="btn-reveal" id="grok-reveal-btn-${i}" onclick="revealPortalCredential({ kind:'grok', index:${i}, productId:'033c664e-2a58-4893-919c-a84345fff0c6', slotIndex:${slotIndex}, emailFieldId:'grok-email-${i}', passFieldId:'grok-pass-val-${i}', dotsFieldId:'grok-dots-${i}', copyBtnId:'grok-copy-pass-${i}', buttonId:'grok-reveal-btn-${i}' })"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
                      </div>
                  </div>
              </div>`;
          }
-       }
-       if (!hasAnyCred) {
-         html += `<div class="cred-field full" style="text-align:center;padding:24px;"><div style="font-size:0.85rem;color:var(--amber);margin-bottom:8px;font-weight:600;">⚠️ Credenciais em processamento</div><div style="font-size:0.75rem;color:var(--muted2);">Adquirido! Suas credenciais Grok (emails e senhas) estão sendo vinculadas. Atualize a página e teste novamente em alguns minutos.</div></div>`;
-       } else {
-         html += `
-         <div class="cred-field full" style="text-align:center;padding-top:12px;">
-           <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Use uma das suas credenciais exclusivas acima para logar no GROK</div>
-           <a href="https://accounts.x.ai/sign-in?redirect=grok-com&email=true" target="_blank" rel="noopener">
-             <button class="btn-login" style="width:auto;padding:0 30px;height:40px;font-size:0.85rem;background:linear-gradient(135deg, #f59e0b, #d97706); border-color:#d97706;">⚡ Acessar Grok no X</button>
-           </a>
-         </div>`;
+         if (!hasAnyCred) {
+           html += `<div class="cred-field full" style="text-align:center;padding:24px;"><div style="font-size:0.85rem;color:var(--amber);margin-bottom:8px;font-weight:600;">⚠️ Credenciais em processamento</div><div style="font-size:0.75rem;color:var(--muted2);">Adquirido! Suas credenciais Grok (emails e senhas) estão sendo vinculadas. Atualize a página e teste novamente em alguns minutos.</div></div>`;
+         } else {
+           html += `
+           <div class="cred-field full" style="text-align:center;padding-top:12px;">
+             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Use uma das suas credenciais exclusivas acima para logar no GROK</div>
+             <a href="https://accounts.x.ai/sign-in?redirect=grok-com&email=true" target="_blank" rel="noopener">
+               <button class="btn-login" style="width:auto;padding:0 30px;height:40px;font-size:0.85rem;background:linear-gradient(135deg, #f59e0b, #d97706); border-color:#d97706;">⚡ Acessar Grok no X</button>
+             </a>
+           </div>`;
+         }
        }
        html += `</div>`;
      } else {
@@ -1236,55 +1342,50 @@ function jumpMsg(idx){
 
 /* ── REVEAL ADSPOWER ── */
 let revealTimer=null,countTimer=null;
+const revealHideTimers = Object.create(null);
+const revealCountTimers = Object.create(null);
+
+function getPortalSecret(kind, index=1){
+ if(kind==='boxpower') return { email: currentClient?.adspower_login || '', password: currentClient?.adspower_password || '' };
+ if(kind==='veo3') return { email: currentClient?.veo3_email || '', password: currentClient?.veo3_password || '' };
+ if(kind==='grok') return { email: currentClient?.[`grok_email_${index}`] || '', password: currentClient?.[`grok_pass_${index}`] || '' };
+ return { email:'', password:'' };
+}
+
+async function revealPortalCredential(opts={}){
+ const { kind, index=1, productId, slotIndex=1, emailFieldId=null, passFieldId, dotsFieldId, copyBtnId=null, buttonId, timerId=null, hideMs=15000 } = opts;
+ const rb=document.getElementById(buttonId);if(rb)rb.disabled=true;
+ try{
+  if(!currentClient?.email || !currentPin){ toast('Faça login novamente.','warn'); return; }
+  const syncRes = await syncCurrentPortalState();
+  if(!syncRes.ok || !currentClient){ toast('Erro ao liberar. Faça login novamente.','warn'); return; }
+  const productState = getPortalProductState(slotIndex, productId, currentClient);
+  if(productState?.cycle?.expired){ toast('Assinatura vencida. Renove para liberar o acesso.','warn'); return; }
+  if(productState?.missing_cycle){ toast('Produto ativo sem ciclo válido. Corrija a integridade do portal.','warn'); return; }
+  const secret = getPortalSecret(kind, index);
+  if(emailFieldId && secret.email) setEl(emailFieldId, secret.email);
+  if(!secret.password){ toast('Senha ainda não disponível. Atualize a página e tente novamente.','warn'); return; }
+  const pv=document.getElementById(passFieldId), dt=document.getElementById(dotsFieldId), cp=copyBtnId?document.getElementById(copyBtnId):null, tl=timerId?document.getElementById(timerId):null;
+  if(!pv || !dt || !rb){ toast('Falha ao renderizar a credencial.','warn'); return; }
+  pv.textContent = secret.password;
+  pv.style.display='inline';dt.style.display='none';rb.style.display='none';if(cp)cp.style.display='inline-flex';if(tl)tl.style.display='inline';
+  if(tl){
+   let secs=Math.floor(hideMs/1000);tl.textContent=secs+'s';
+   if(revealCountTimers[buttonId]) clearInterval(revealCountTimers[buttonId]);
+   revealCountTimers[buttonId]=setInterval(()=>{secs--;if(tl)tl.textContent=secs+'s';if(secs<=0){clearInterval(revealCountTimers[buttonId]);delete revealCountTimers[buttonId];}},1000);
+  }
+  if(revealHideTimers[buttonId]) clearTimeout(revealHideTimers[buttonId]);
+  revealHideTimers[buttonId]=setTimeout(()=>{
+   pv.style.display='none';dt.style.display='inline';rb.style.display='inline-flex';if(cp)cp.style.display='none';if(tl)tl.style.display='none';
+  },hideMs);
+ }catch(e){toast('Erro ao liberar senha.','warn');}
+ finally{if(rb)rb.disabled=false;}
+}
+
 async function revealPassword(){
  const rb=document.getElementById('reveal-btn');if(rb)rb.disabled=true;
  try{
-  if(!currentClient?.email || !currentPin){
-   toast('Faça login novamente.','warn');
-   return;
-  }
-  const syncRes = await syncCurrentPortalState();
-  if(!syncRes.ok || !currentClient){
-   toast('Erro ao liberar. Faça login novamente.','warn');
-   return;
-  }
-
-  const boxProduct = getPortalProductState(1, '1c13544a-1435-4071-a10a-566e80cad327', currentClient);
-  if (boxProduct?.cycle?.expired) {
-    toast('Assinatura vencida. Renove para liberar o acesso.', 'warn');
-    if (rb) rb.disabled = false;
-    return;
-  }
-  if (boxProduct && boxProduct.missing_cycle) {
-    toast('Produto ativo sem ciclo válido. Corrija a integridade do portal.', 'warn');
-    if (rb) rb.disabled = false;
-    return;
-  }
-  const senha = currentClient?.adspower_password || '';
-  const perfil = currentClient?.adspower_login || '';
-
-  if(!senha){
-   toast('Senha ainda não disponível. Atualize a página (F5) e tente novamente.','warn');
-   return;
-  }
-
-  if(perfil)setEl('ads-profile-id',perfil);
-  if(senha){
-   setEl('pass-val',senha);
-   document.getElementById('pass-val').style.display='inline';
-   document.getElementById('dots-view').style.display='none';
-   const cp=document.getElementById('copy-pass'),rb2=document.getElementById('reveal-btn'),tl=document.getElementById('timer-lbl');
-   if(cp)cp.style.display='inline-flex';if(rb2)rb2.style.display='none';if(tl)tl.style.display='inline';
-   let secs=15;tl.textContent=secs+'s';
-   if(countTimer)clearInterval(countTimer);
-   countTimer=setInterval(()=>{secs--;tl.textContent=secs+'s';if(secs<=0)clearInterval(countTimer);},1000);
-   if(revealTimer)clearTimeout(revealTimer);
-   revealTimer=setTimeout(()=>{
-    document.getElementById('pass-val').style.display='none';
-    document.getElementById('dots-view').style.display='inline';
-    if(cp)cp.style.display='none';if(rb2)rb2.style.display='inline-flex';if(tl)tl.style.display='none';
-   },15000);
-  }
+  await revealPortalCredential({ kind:'boxpower', productId:'1c13544a-1435-4071-a10a-566e80cad327', slotIndex:1, emailFieldId:'ads-profile-id', passFieldId:'pass-val', dotsFieldId:'dots-view', copyBtnId:'copy-pass', buttonId:'reveal-btn', timerId:'timer-lbl' });
  }catch(e){toast('Erro ao liberar senha.','warn');}
  finally{if(rb)rb.disabled=false;}
 }
