@@ -223,6 +223,12 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-panel-content{padding:0 22px 22px;display:flex;flex-direction:column;gap:16px;}
 .tutorial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
 .tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:210px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+.tutorial-card-player{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);margin-bottom:2px;}
+.tutorial-card-player iframe,.tutorial-card-player-thumb,.tutorial-card-player-placeholder{position:absolute;inset:0;width:100%;height:100%;}
+.tutorial-card-player-thumb{display:block;border:none;padding:0;background:#050816;cursor:pointer;}
+.tutorial-card-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.tutorial-card-player-thumb::after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(4,7,15,0.78);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:1.6rem;box-shadow:0 18px 44px rgba(0,0,0,0.35);backdrop-filter:blur(8px);}
+.tutorial-card-player-placeholder{display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:1.9rem;}
 .tutorial-card:hover{transform:translateY(-2px);border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.04);}
 .tutorial-thumb{height:110px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(139,92,246,0.14));border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:2rem;}
 .tutorial-tags{display:flex;gap:8px;flex-wrap:wrap;}
@@ -796,6 +802,31 @@ const TUTORIAL_GROUPS = [
 let activeTutorialGroupId = TUTORIAL_GROUPS[0]?.id || null;
 let currentTutorialItem = null;
 
+let activeInlineTutorialKey = '';
+
+function renderTutorialCardMedia(groupId, item, idx){
+ const rawUrl = String(item?.videoUrl||'').trim();
+ if(!rawUrl) return `<div class="tutorial-card-player"><div class="tutorial-card-player-placeholder">${item.icon}</div></div>`;
+ const key = `${groupId}:${idx}`;
+ const youtubeId = extractYouTubeVideoId(rawUrl);
+ if(activeInlineTutorialKey === key){
+  const embedUrl = buildTutorialEmbedUrl(item);
+  return `<div class="tutorial-card-player"><iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+ }
+ if(youtubeId){
+  const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-card-player-placeholder\">🎬</div>';" /></button></div>`;
+ }
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
+}
+
+function toggleInlineTutorialPlayer(groupId, idx){
+ const key = `${groupId}:${idx}`;
+ activeInlineTutorialKey = activeInlineTutorialKey === key ? '' : key;
+ activeTutorialGroupId = groupId;
+ renderTutorialShelves();
+}
+
 function renderTutorialShelves(){
  const root=document.getElementById('tutorialAccordion');
  if(!root) return;
@@ -824,13 +855,13 @@ function renderTutorialShelves(){
           const hasVideo = !!String(item.videoUrl||'').trim();
           return `
            <div class="tutorial-card">
-            <div class="tutorial-thumb">${item.icon}</div>
+            ${renderTutorialCardMedia(group.id, item, idx)}
             <div class="tutorial-tags">${(item.tags||[]).map((tag,tagIdx)=>`<span class="tutorial-tag ${tagIdx===0?'primary':''}">${tag}</span>`).join('')}</div>
             <div class="tutorial-card-title">${item.title}</div>
             <div class="tutorial-card-desc">${item.desc}</div>
             <div class="tutorial-card-actions">
              <span class="tutorial-card-status">${hasVideo ? 'Player disponível' : 'Vídeo em breve'}</span>
-             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); openTutorialModal('${group.id}', ${idx})">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
+             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); ${hasVideo ? `toggleInlineTutorialPlayer('${group.id}', ${idx})` : `openTutorialModal('${group.id}', ${idx})`}">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
             </div>
            </div>`;
         }).join('')}

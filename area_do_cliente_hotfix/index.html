@@ -725,6 +725,31 @@ const TUTORIAL_GROUPS = [
 let activeTutorialGroupId = TUTORIAL_GROUPS[0]?.id || null;
 let currentTutorialItem = null;
 
+let activeInlineTutorialKey = '';
+
+function renderTutorialCardMedia(groupId, item, idx){
+ const rawUrl = String(item?.videoUrl||'').trim();
+ if(!rawUrl) return `<div class="tutorial-card-player"><div class="tutorial-card-player-placeholder">${item.icon}</div></div>`;
+ const key = `${groupId}:${idx}`;
+ const youtubeId = extractYouTubeVideoId(rawUrl);
+ if(activeInlineTutorialKey === key){
+  const embedUrl = buildTutorialEmbedUrl(item);
+  return `<div class="tutorial-card-player"><iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+ }
+ if(youtubeId){
+  const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-card-player-placeholder\">🎬</div>';" /></button></div>`;
+ }
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
+}
+
+function toggleInlineTutorialPlayer(groupId, idx){
+ const key = `${groupId}:${idx}`;
+ activeInlineTutorialKey = activeInlineTutorialKey === key ? '' : key;
+ activeTutorialGroupId = groupId;
+ renderTutorialShelves();
+}
+
 function renderTutorialShelves(){
  const root=document.getElementById('tutorialAccordion');
  if(!root) return;
@@ -753,13 +778,13 @@ function renderTutorialShelves(){
           const hasVideo = !!String(item.videoUrl||'').trim();
           return `
            <div class="tutorial-card">
-            <div class="tutorial-thumb">${item.icon}</div>
+            ${renderTutorialCardMedia(group.id, item, idx)}
             <div class="tutorial-tags">${(item.tags||[]).map((tag,tagIdx)=>`<span class="tutorial-tag ${tagIdx===0?'primary':''}">${tag}</span>`).join('')}</div>
             <div class="tutorial-card-title">${item.title}</div>
             <div class="tutorial-card-desc">${item.desc}</div>
             <div class="tutorial-card-actions">
              <span class="tutorial-card-status">${hasVideo ? 'Player disponível' : 'Vídeo em breve'}</span>
-             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); openTutorialModal('${group.id}', ${idx})">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
+             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); ${hasVideo ? `toggleInlineTutorialPlayer('${group.id}', ${idx})` : `openTutorialModal('${group.id}', ${idx})`}">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
             </div>
            </div>`;
         }).join('')}
