@@ -234,9 +234,10 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .tutorial-toggle-icon{width:40px;height:40px;font-size:1.15rem;}
  .tutorial-toggle-meta{gap:8px;}
  .tutorial-count{font-size:0.65rem;padding:5px 8px;}
- .tutorial-panel-content{padding:0 18px 18px;}
- .tutorial-grid{grid-template-columns:1fr;}
- .tutorial-card{min-height:auto;}
+ .tutorial-panel-content{padding:0 14px 14px;}
+ .tutorial-grid{display:flex;flex-direction:column;gap:14px;}
+ .tutorial-card{min-height:auto;width:100%;padding:16px;border-radius:18px;}
+ .tutorial-card-player{margin-bottom:8px;}
  .tutorial-card-actions{align-items:stretch;flex-direction:column;}
  .tutorial-card-actions .tutorial-btn{width:100%;justify-content:center;}
 }
@@ -693,7 +694,7 @@ function renderTutorialCardMedia(groupId, item, idx){
  }
  if(youtubeId){
   const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
-  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-card-player-placeholder\">🎬</div>';" /></button></div>`;
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" /></button></div>`;
  }
  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
 }

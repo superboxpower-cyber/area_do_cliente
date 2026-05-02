@@ -222,8 +222,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-panel-inner{overflow:hidden;}
 .tutorial-panel-content{padding:0 22px 22px;display:flex;flex-direction:column;gap:16px;}
 .tutorial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
-.tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:210px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
-.tutorial-card-player{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);margin-bottom:2px;}
+.tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:210px;transition:transform .18s ease,border-color .18s ease,background .18s ease;overflow:hidden;}
+.tutorial-card-player{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);margin-bottom:6px;}
 .tutorial-card-player iframe,.tutorial-card-player-thumb,.tutorial-card-player-placeholder{position:absolute;inset:0;width:100%;height:100%;}
 .tutorial-card-player-thumb{display:block;border:none;padding:0;background:#050816;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .tutorial-card-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -234,9 +234,9 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-tags{display:flex;gap:8px;flex-wrap:wrap;}
 .tutorial-tag{font-size:0.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);}
 .tutorial-tag.primary{color:var(--green);border-color:rgba(16,185,129,0.22);background:rgba(16,185,129,0.08);}
-.tutorial-card-title{font-size:0.92rem;font-weight:700;line-height:1.35;}
+.tutorial-card-title{font-size:0.98rem;font-weight:800;line-height:1.35;margin-top:2px;}
 .tutorial-card-desc{font-size:0.76rem;color:var(--muted2);line-height:1.55;flex:1;}
-.tutorial-card-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+.tutorial-card-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:auto;padding-top:2px;}
 .tutorial-card-status{font-size:0.68rem;color:var(--muted);font-weight:600;}
 .tutorial-btn{height:40px;padding:0 16px;border-radius:12px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.8rem;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .tutorial-btn:hover{transform:translateY(-1px);border-color:rgba(16,185,129,0.35);}
@@ -292,9 +292,10 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .tutorial-toggle-icon{width:40px;height:40px;font-size:1.15rem;}
  .tutorial-toggle-meta{gap:8px;}
  .tutorial-count{font-size:0.65rem;padding:5px 8px;}
- .tutorial-panel-content{padding:0 18px 18px;}
- .tutorial-grid{grid-template-columns:1fr;}
- .tutorial-card{min-height:auto;}
+ .tutorial-panel-content{padding:0 14px 14px;}
+ .tutorial-grid{display:flex;flex-direction:column;gap:14px;}
+ .tutorial-card{min-height:auto;width:100%;padding:16px;border-radius:18px;}
+ .tutorial-card-player{margin-bottom:8px;}
  .tutorial-card-actions{align-items:stretch;flex-direction:column;}
  .tutorial-card-actions .tutorial-btn{width:100%;justify-content:center;}
 }
@@ -751,7 +752,7 @@ function renderTutorialCardMedia(groupId, item, idx){
  }
  if(youtubeId){
   const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
-  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-card-player-placeholder\">🎬</div>';" /></button></div>`;
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" /></button></div>`;
  }
  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
 }
