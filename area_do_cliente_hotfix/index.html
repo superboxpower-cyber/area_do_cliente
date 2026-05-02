@@ -227,6 +227,26 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .pay-summary{flex-direction:column;}
  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;-webkit-tap-highlight-color:transparent;}
  .sidebar-overlay.show{display:block;}
+ .tutorial-toolbar{align-items:flex-start;}
+ .tutorial-toolbar-note{font-size:0.74rem;}
+ .tutorial-toggle{padding:18px;}
+ .tutorial-toggle-main{align-items:flex-start;}
+ .tutorial-toggle-icon{width:40px;height:40px;font-size:1.15rem;}
+ .tutorial-toggle-meta{gap:8px;}
+ .tutorial-count{font-size:0.65rem;padding:5px 8px;}
+ .tutorial-panel-content{padding:0 18px 18px;}
+ .tutorial-grid{grid-template-columns:1fr;}
+ .tutorial-card{min-height:auto;}
+ .tutorial-card-actions{align-items:flex-start;flex-direction:column;}
+ .tutorial-modal-overlay{padding:10px;}
+ .tutorial-modal{width:100%;max-height:92vh;border-radius:22px;}
+ .tutorial-modal-head{padding:18px 18px 12px;}
+ .tutorial-modal-title{font-size:1rem;}
+ .tutorial-modal-body{grid-template-columns:1fr;padding:14px 18px 18px;gap:14px;}
+ .tutorial-player-shell{min-height:auto;padding:12px;}
+ .tutorial-player-actions{flex-direction:column;}
+ .tutorial-player-actions .tutorial-btn{width:100%;justify-content:center;}
+ .tutorial-modal-side{gap:12px;}
 }
 .mobile-topbar{display:none;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(4,7,15,0.85);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);margin:-16px -16px 16px;}
 .hamburger{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--glass2);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -755,22 +775,32 @@ function toggleTutorialShelf(groupId){
  renderTutorialShelves();
 }
 
-function normalizeTutorialEmbed(url){
+function extractYouTubeVideoId(url){
  const raw=String(url||'').trim();
  if(!raw) return '';
  try{
   const u=new URL(raw);
-  if(u.hostname.includes('youtu.be')){
-   const id=u.pathname.replace(/^\//,'').split('/')[0];
-   return id ? `https://www.youtube.com/embed/${id}` : raw;
-  }
+  if(u.hostname.includes('youtu.be')) return u.pathname.replace(/^\//,'').split('/')[0] || '';
   if(u.hostname.includes('youtube.com')){
-   const id=u.searchParams.get('v');
-   if(id) return `https://www.youtube.com/embed/${id}`;
-   if(u.pathname.includes('/embed/')) return raw;
+   if(u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || '';
+   if(u.pathname.includes('/embed/')) return u.pathname.split('/embed/')[1]?.split(/[?&]/)[0] || '';
+   return u.searchParams.get('v') || '';
   }
-  return raw;
- }catch(_){ return raw; }
+ }catch(_){ }
+ return '';
+}
+
+function renderTutorialMedia(item){
+ const rawUrl = String(item?.videoUrl||'').trim();
+ if(!rawUrl){
+  return `<div class="tutorial-player-placeholder"><div style="font-size:2.1rem;">🧩</div><strong>Vídeo ainda não cadastrado</strong><span>Mas a estrutura do tutorial já está pronta. Quando o link for adicionado, ele abre aqui dentro do portal sem tirar o cliente da navegação.</span></div>`;
+ }
+ const youtubeId = extractYouTubeVideoId(rawUrl);
+ if(youtubeId){
+  const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+  return `<a class="tutorial-player-thumb" href="${rawUrl}" target="_blank" rel="noopener" aria-label="Assistir tutorial no YouTube"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-player-placeholder\"><div style=\"font-size:2rem;\">🎬</div><strong>Abrir tutorial</strong><span>Toque no botão abaixo para assistir no YouTube.</span></div>';" /></a>`;
+ }
+ return `<iframe src="${rawUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
 }
 
 function openTutorialModal(groupId, itemIndex){
@@ -788,12 +818,10 @@ function openTutorialModal(groupId, itemIndex){
  document.getElementById('tutorialModalSub').textContent = item.desc;
  document.getElementById('tutorialModalDesc').textContent = item.desc;
  document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
- const embedUrl = normalizeTutorialEmbed(item.videoUrl);
- if(embedUrl){
-  frame.innerHTML = `<iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir em nova aba</button>`;
+ frame.innerHTML = renderTutorialMedia(item);
+ if(String(item.videoUrl||'').trim()){
+  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button>`;
  } else {
-  frame.innerHTML = `<div class="tutorial-player-placeholder"><div style="font-size:2.1rem;">🧩</div><strong>Vídeo ainda não cadastrado</strong><span>Mas a estrutura do tutorial já está pronta. Quando o link for adicionado, ele abre aqui dentro do portal em modal, sem tirar o cliente da navegação.</span></div>`;
   actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
  }
  if(overlay) overlay.classList.add('show');
