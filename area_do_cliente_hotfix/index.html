@@ -680,7 +680,7 @@ const TUTORIAL_GROUPS = [
   ]
  }
 ];
-let activeTutorialGroupId = TUTORIAL_GROUPS[0]?.id || null;
+let activeTutorialGroupId = null;
 let currentTutorialItem = null;
 
 let activeInlineTutorialKey = '';
@@ -723,6 +723,7 @@ function renderTutorialShelves(){
  if(!root) return;
  root.innerHTML = TUTORIAL_GROUPS.map(group=>{
   const isOpen = group.id === activeTutorialGroupId;
+  const availableItems = (group.items||[]).filter(item => !!String(item.videoUrl||'').trim());
   return `
    <div class="card tutorial-shelf ${isOpen?'is-open':''}" id="tutorial-shelf-${group.id}">
     <button class="tutorial-toggle" onclick="toggleTutorialShelf('${group.id}')">
@@ -734,31 +735,32 @@ function renderTutorialShelves(){
       </div>
      </div>
      <div class="tutorial-toggle-meta">
-      <span class="tutorial-count">${group.items.length} aulas</span>
+      <span class="tutorial-count">${availableItems.length} aulas</span>
       <span class="tutorial-chevron"></span>
      </div>
     </button>
     <div class="tutorial-panel">
      <div class="tutorial-panel-inner">
       <div class="tutorial-panel-content">
+       ${availableItems.length ? `
        <div class="tutorial-grid">
-        ${group.items.map((item,idx)=>{
-          const hasVideo = !!String(item.videoUrl||'').trim();
-          const isPlaying = activeInlineTutorialKey === `${group.id}:${idx}`;
+        ${availableItems.map((item,idx)=>{
+          const realIdx = group.items.indexOf(item);
+          const isPlaying = activeInlineTutorialKey === `${group.id}:${realIdx}`;
           return `
            <div class="tutorial-card">
-            ${renderTutorialCardMedia(group.id, item, idx)}
+            ${renderTutorialCardMedia(group.id, item, realIdx)}
             <div class="tutorial-tags">${(item.tags||[]).map((tag,tagIdx)=>`<span class="tutorial-tag ${tagIdx===0?'primary':''}">${tag}</span>`).join('')}</div>
             <div class="tutorial-card-title">${item.title}</div>
             <div class="tutorial-card-desc">${item.desc}</div>
             <div class="tutorial-card-actions">
-             <span class="tutorial-card-status">${hasVideo ? (isPlaying ? 'Reproduzindo no portal' : 'Player disponível') : 'Vídeo em breve'}</span>
-             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); ${hasVideo ? `toggleInlineTutorialPlayer('${group.id}', ${idx})` : `return false`}">${hasVideo ? (isPlaying ? 'Fechar player' : 'Assistir aqui') : 'Em breve'}</button>
+             <span class="tutorial-card-status">${isPlaying ? 'Reproduzindo no portal' : 'Player disponível'}</span>
+             <button class="tutorial-btn" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${group.id}', ${realIdx})">${isPlaying ? 'Fechar player' : 'Assistir aqui'}</button>
             </div>
            </div>`;
         }).join('')}
        </div>
-       <div class="tutorial-empty">💡 Abra a categoria desejada e selecione o tutorial para assistir sem sair do portal.</div>
+       <div class="tutorial-empty">💡 Abra a categoria desejada e selecione o tutorial para assistir sem sair do portal.</div>` : `<div class="tutorial-empty">⏳ Aguarde os próximos vídeos desta seção.</div>`}
       </div>
      </div>
     </div>
