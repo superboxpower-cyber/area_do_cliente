@@ -252,7 +252,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-player-frame iframe,.tutorial-player-frame video,.tutorial-player-placeholder,.tutorial-player-thumb{position:absolute;inset:0;width:100%;height:100%;}
 .tutorial-player-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted2);gap:10px;}
 .tutorial-player-placeholder strong{color:var(--text);font-size:1rem;}
-.tutorial-player-thumb{display:block;background:#050816;}
+.tutorial-player-thumb{display:block;background:#050816;border:none;padding:0;cursor:pointer;}
 .tutorial-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .tutorial-player-thumb::after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(4,7,15,0.78);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:1.8rem;box-shadow:0 18px 44px rgba(0,0,0,0.35);backdrop-filter:blur(8px);}
 .tutorial-player-actions{display:flex;gap:10px;flex-wrap:wrap;}
@@ -863,6 +863,13 @@ function extractYouTubeVideoId(url){
  return '';
 }
 
+function buildTutorialEmbedUrl(item){
+ const rawUrl = String(item?.videoUrl||'').trim();
+ const youtubeId = extractYouTubeVideoId(rawUrl);
+ if(youtubeId) return `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+ return rawUrl;
+}
+
 function renderTutorialMedia(item){
  const rawUrl = String(item?.videoUrl||'').trim();
  if(!rawUrl){
@@ -871,9 +878,18 @@ function renderTutorialMedia(item){
  const youtubeId = extractYouTubeVideoId(rawUrl);
  if(youtubeId){
   const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
-  return `<a class="tutorial-player-thumb" href="${rawUrl}" target="_blank" rel="noopener" aria-label="Assistir tutorial no YouTube"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-player-placeholder\"><div style=\"font-size:2rem;\">🎬</div><strong>Abrir tutorial</strong><span>Toque no botão abaixo para assistir no YouTube.</span></div>';" /></a>`;
+  return `<button class="tutorial-player-thumb" type="button" onclick="playTutorialInline()" aria-label="Assistir tutorial dentro do portal"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-player-placeholder\"><div style=\"font-size:2rem;\">🎬</div><strong>Assistir dentro do portal</strong><span>Toque no botão abaixo para abrir o player incorporado.</span></div>';" /></button>`;
  }
  return `<iframe src="${rawUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+}
+
+function playTutorialInline(){
+ if(!currentTutorialItem?.item) return;
+ const frame=document.getElementById('tutorialPlayerFrame');
+ const item=currentTutorialItem.item;
+ const embedUrl = buildTutorialEmbedUrl(item);
+ if(!embedUrl || !frame) return;
+ frame.innerHTML = `<iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
 }
 
 function openTutorialModal(groupId, itemIndex){
@@ -893,7 +909,7 @@ function openTutorialModal(groupId, itemIndex){
  document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
  frame.innerHTML = renderTutorialMedia(item);
  if(String(item.videoUrl||'').trim()){
-  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button><div class="tutorial-mobile-cta"><button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir vídeo no YouTube</button></div>`;
+  actions.innerHTML = `<button class="tutorial-btn" onclick="playTutorialInline()">Assistir vídeo</button><div class="tutorial-mobile-cta"><button class="tutorial-btn" onclick="playTutorialInline()">Reproduzir no portal</button></div><button class="tutorial-btn secondary" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir no YouTube</button>`;
  } else {
   actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
  }
