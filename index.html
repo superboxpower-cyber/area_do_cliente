@@ -201,21 +201,65 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .popup-overlay{position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.72);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:24px;}
 
 /* TUTORIAIS */
-.tutorial-shelf{margin-bottom:22px;padding:22px;}
-.tutorial-shelf-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-.tutorial-shelf-title{font-size:1.05rem;font-weight:800;}
-.tutorial-shelf-sub{font-size:0.75rem;color:var(--muted);}
+.tutorial-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+.tutorial-toolbar-note{font-size:0.78rem;color:var(--muted2);max-width:560px;line-height:1.6;}
+.tutorial-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.tutorial-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px rgba(16,185,129,0.45);}
+.tutorial-accordion{display:flex;flex-direction:column;gap:16px;}
+.tutorial-shelf{margin-bottom:0;padding:0;overflow:hidden;transition:border-color .2s ease,background .2s ease;}
+.tutorial-shelf.is-open{border-color:rgba(16,185,129,0.22);box-shadow:0 0 0 1px rgba(16,185,129,0.06) inset;}
+.tutorial-toggle{width:100%;background:none;border:none;color:inherit;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;text-align:left;font-family:'Outfit',sans-serif;}
+.tutorial-toggle-main{display:flex;align-items:center;gap:14px;min-width:0;}
+.tutorial-toggle-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(139,92,246,0.14));border:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.tutorial-shelf-title{font-size:1.02rem;font-weight:800;line-height:1.2;}
+.tutorial-shelf-sub{font-size:0.75rem;color:var(--muted);line-height:1.55;margin-top:4px;}
+.tutorial-toggle-meta{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.tutorial-count{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted2);padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);}
+.tutorial-chevron{width:14px;height:14px;border-right:2px solid var(--muted2);border-bottom:2px solid var(--muted2);transform:rotate(45deg);transition:transform .25s ease, border-color .2s ease;margin-right:4px;}
+.tutorial-shelf.is-open .tutorial-chevron{transform:rotate(-135deg);border-color:var(--green);margin-top:4px;}
+.tutorial-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease;}
+.tutorial-shelf.is-open .tutorial-panel{grid-template-rows:1fr;}
+.tutorial-panel-inner{overflow:hidden;}
+.tutorial-panel-content{padding:0 22px 22px;display:flex;flex-direction:column;gap:16px;}
 .tutorial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
-.tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:180px;}
+.tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:210px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+.tutorial-card:hover{transform:translateY(-2px);border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.04);}
 .tutorial-thumb{height:110px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(139,92,246,0.14));border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:2rem;}
 .tutorial-tags{display:flex;gap:8px;flex-wrap:wrap;}
 .tutorial-tag{font-size:0.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);}
 .tutorial-tag.primary{color:var(--green);border-color:rgba(16,185,129,0.22);background:rgba(16,185,129,0.08);}
 .tutorial-card-title{font-size:0.92rem;font-weight:700;line-height:1.35;}
 .tutorial-card-desc{font-size:0.76rem;color:var(--muted2);line-height:1.55;flex:1;}
-.tutorial-card-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.tutorial-btn{height:34px;padding:0 14px;border-radius:10px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;}
+.tutorial-card-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+.tutorial-card-status{font-size:0.68rem;color:var(--muted);font-weight:600;}
+.tutorial-btn{height:34px;padding:0 14px;border-radius:10px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s ease;}
+.tutorial-btn:hover{transform:translateY(-1px);border-color:rgba(16,185,129,0.35);}
 .tutorial-btn.secondary{border-color:var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);}
+.tutorial-btn.secondary:hover{color:var(--text);border-color:rgba(255,255,255,0.18);}
+.tutorial-empty{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.025);border:1px dashed rgba(255,255,255,0.09);font-size:0.76rem;color:var(--muted2);line-height:1.6;}
+.tutorial-modal-overlay{position:fixed;inset:0;background:rgba(4,7,15,0.82);backdrop-filter:blur(16px);z-index:9600;display:none;align-items:center;justify-content:center;padding:20px;}
+.tutorial-modal-overlay.show{display:flex;animation:fadeIn2 .25s ease both;}
+.tutorial-modal{width:min(960px,100%);max-height:min(88vh,900px);overflow:hidden;background:rgba(10,15,28,0.97);border:1px solid rgba(255,255,255,0.09);border-radius:28px;box-shadow:0 40px 100px rgba(0,0,0,0.72);display:flex;flex-direction:column;}
+.tutorial-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 22px 14px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.tutorial-modal-kicker{font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:8px;}
+.tutorial-modal-title{font-size:1.18rem;font-weight:800;line-height:1.2;}
+.tutorial-modal-sub{font-size:0.78rem;color:var(--muted2);line-height:1.6;margin-top:6px;}
+.tutorial-modal-close{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted2);cursor:pointer;font-size:1.2rem;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tutorial-modal-close:hover{color:var(--text);border-color:rgba(255,255,255,0.18);}
+.tutorial-modal-body{padding:18px 22px 22px;overflow:auto;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,0.85fr);gap:18px;}
+.tutorial-player-shell{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:14px;min-height:360px;}
+.tutorial-player-frame{position:relative;padding-top:56.25%;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);}
+.tutorial-player-frame iframe,.tutorial-player-frame video,.tutorial-player-placeholder{position:absolute;inset:0;width:100%;height:100%;}
+.tutorial-player-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted2);gap:10px;}
+.tutorial-player-placeholder strong{color:var(--text);font-size:1rem;}
+.tutorial-player-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.tutorial-modal-side{display:flex;flex-direction:column;gap:14px;}
+.tutorial-side-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:18px;padding:16px;}
+.tutorial-side-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;margin-bottom:10px;}
+.tutorial-side-text{font-size:0.82rem;color:var(--muted2);line-height:1.7;}
+.tutorial-side-list{padding-left:16px;color:var(--muted2);display:flex;flex-direction:column;gap:8px;font-size:0.8rem;line-height:1.6;}
+.tutorial-side-list li strong{color:var(--text);}
+
 .popup-overlay.show{display:flex;animation:fadeIn2 .25s ease both;}
 @keyframes fadeIn2{from{opacity:0}to{opacity:1}}
 .popup-card{width:100%;max-width:420px;background:rgba(10,15,28,0.94);border:1px solid rgba(255,255,255,0.09);border-radius:26px;box-shadow:0 40px 100px rgba(0,0,0,0.7);backdrop-filter:blur(30px);overflow:hidden;animation:popIn .35s cubic-bezier(.4,0,.2,1) both;position:relative;}
@@ -560,80 +604,11 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   <div class="section" id="section-tutoriais">
    <div class="section-title">Central de Tutoriais</div>
    <div class="section-sub">Aprenda a usar suas ferramentas com vídeos rápidos, diretos e organizados por produto.</div>
-
-   <div class="card tutorial-shelf">
-    <div class="tutorial-shelf-head">
-     <div>
-      <div class="tutorial-shelf-title">Comece por aqui</div>
-      <div class="tutorial-shelf-sub">Os vídeos mais importantes para ativação e primeiros passos.</div>
-     </div>
-    </div>
-    <div class="tutorial-grid">
-     <div class="tutorial-card">
-      <div class="tutorial-thumb">🔓</div>
-      <div class="tutorial-tags"><span class="tutorial-tag primary">Importante</span><span class="tutorial-tag">Iniciante</span></div>
-      <div class="tutorial-card-title">Como acessar o portal pela primeira vez</div>
-      <div class="tutorial-card-desc">Vídeo ideal para quem acabou de entrar e quer localizar acessos, PIN e produtos liberados.</div>
-      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
-     </div>
-     <div class="tutorial-card">
-      <div class="tutorial-thumb">📱</div>
-      <div class="tutorial-tags"><span class="tutorial-tag">Dica rápida</span></div>
-      <div class="tutorial-card-title">Como usar no celular sem erro</div>
-      <div class="tutorial-card-desc">Atalho rápido mostrando login, cópia de credenciais e navegação no celular.</div>
-      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
-     </div>
-     <div class="tutorial-card">
-      <div class="tutorial-thumb">🛟</div>
-      <div class="tutorial-tags"><span class="tutorial-tag">Suporte</span></div>
-      <div class="tutorial-card-title">Erros comuns e como resolver</div>
-      <div class="tutorial-card-desc">Checklist simples para cliente se virar antes de chamar suporte.</div>
-      <div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div>
-     </div>
-    </div>
+   <div class="tutorial-toolbar">
+    <div class="tutorial-toolbar-note">Agora os tutoriais ficam recolhidos por categoria. Conforme o cliente navega, uma categoria abre e a outra retrai para manter a área limpa e muito mais fácil de usar no celular.</div>
+    <div class="tutorial-pill">Player interno no portal</div>
    </div>
-
-   <div class="card tutorial-shelf">
-    <div class="tutorial-shelf-head">
-     <div>
-      <div class="tutorial-shelf-title">BoxPower</div>
-      <div class="tutorial-shelf-sub">Tutorial de uso do portal principal e recursos da conta.</div>
-     </div>
-    </div>
-    <div class="tutorial-grid">
-     <div class="tutorial-card"><div class="tutorial-thumb">📦</div><div class="tutorial-tags"><span class="tutorial-tag primary">Iniciante</span></div><div class="tutorial-card-title">Como acessar o BoxPower</div><div class="tutorial-card-desc">Passo a passo da entrada no portal e visualização dos recursos liberados.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">⚙️</div><div class="tutorial-tags"><span class="tutorial-tag">Intermediário</span></div><div class="tutorial-card-title">Configuração básica e boas práticas</div><div class="tutorial-card-desc">Organização inicial para o cliente aproveitar melhor a plataforma.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">🚀</div><div class="tutorial-tags"><span class="tutorial-tag">Avançado</span></div><div class="tutorial-card-title">Fluxo de uso no dia a dia</div><div class="tutorial-card-desc">Exemplo rápido de como extrair mais valor do produto logo no primeiro uso.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-    </div>
-   </div>
-
-   <div class="card tutorial-shelf">
-    <div class="tutorial-shelf-head">
-     <div>
-      <div class="tutorial-shelf-title">VEO3</div>
-      <div class="tutorial-shelf-sub">Acesso, uso correto da conta e melhores práticas para evitar bloqueios.</div>
-     </div>
-    </div>
-    <div class="tutorial-grid">
-     <div class="tutorial-card"><div class="tutorial-thumb">🎬</div><div class="tutorial-tags"><span class="tutorial-tag primary">Importante</span></div><div class="tutorial-card-title">Como liberar e acessar o VEO3</div><div class="tutorial-card-desc">Mostra o caminho de liberação, cópia das credenciais e entrada correta.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">🧠</div><div class="tutorial-tags"><span class="tutorial-tag">Prompt</span></div><div class="tutorial-card-title">Como montar prompts melhores</div><div class="tutorial-card-desc">Tutorial rápido para o cliente sair do básico e gerar vídeos mais consistentes.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">🛡️</div><div class="tutorial-tags"><span class="tutorial-tag">Segurança</span></div><div class="tutorial-card-title">Como evitar uso indevido e bloqueios</div><div class="tutorial-card-desc">Explica as regras práticas de uso para não comprometer o acesso compartilhado.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-    </div>
-   </div>
-
-   <div class="card tutorial-shelf">
-    <div class="tutorial-shelf-head">
-     <div>
-      <div class="tutorial-shelf-title">Grok & ChatGPT</div>
-      <div class="tutorial-shelf-sub">Tutoriais de IA conversacional, login e uso prático.</div>
-     </div>
-    </div>
-    <div class="tutorial-grid">
-     <div class="tutorial-card"><div class="tutorial-thumb">⚡</div><div class="tutorial-tags"><span class="tutorial-tag primary">Grok</span></div><div class="tutorial-card-title">Primeiro acesso ao Grok</div><div class="tutorial-card-desc">Ensina como usar uma das credenciais vinculadas e começar sem travar.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">🤖</div><div class="tutorial-tags"><span class="tutorial-tag primary">ChatGPT</span></div><div class="tutorial-card-title">Como usar no dia a dia</div><div class="tutorial-card-desc">Guia prático para prompts, pesquisa, escrita e suporte com IA.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-     <div class="tutorial-card"><div class="tutorial-thumb">💡</div><div class="tutorial-tags"><span class="tutorial-tag">Produtividade</span></div><div class="tutorial-card-title">Prompts prontos para tarefas comuns</div><div class="tutorial-card-desc">Coleção de usos rápidos para acelerar o resultado do cliente.</div><div class="tutorial-card-actions"><button class="tutorial-btn secondary">Adicionar vídeo</button></div></div>
-    </div>
-   </div>
+   <div class="tutorial-accordion" id="tutorialAccordion"></div>
   </div>
 
   <!-- SECTION: OTIMIZADOR -->
@@ -677,6 +652,41 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="tutorial-modal-overlay" id="tutorialModalOverlay" onclick="closeTutorialModal(event)">
+ <div class="tutorial-modal" onclick="event.stopPropagation()">
+  <div class="tutorial-modal-head">
+   <div>
+    <div class="tutorial-modal-kicker" id="tutorialModalKicker">Tutorial</div>
+    <div class="tutorial-modal-title" id="tutorialModalTitle">Central de Tutoriais</div>
+    <div class="tutorial-modal-sub" id="tutorialModalSub">Abra um tutorial organizado sem sair do portal.</div>
+   </div>
+   <button class="tutorial-modal-close" onclick="closeTutorialModal()">×</button>
+  </div>
+  <div class="tutorial-modal-body">
+   <div class="tutorial-player-shell">
+    <div class="tutorial-player-frame" id="tutorialPlayerFrame">
+     <div class="tutorial-player-placeholder">
+      <div style="font-size:2rem;">🎬</div>
+      <strong>Selecione um tutorial</strong>
+      <span>Quando o vídeo estiver vinculado, ele abre aqui dentro do portal.</span>
+     </div>
+    </div>
+    <div class="tutorial-player-actions" id="tutorialPlayerActions"></div>
+   </div>
+   <div class="tutorial-modal-side">
+    <div class="tutorial-side-card">
+     <div class="tutorial-side-title">Resumo</div>
+     <div class="tutorial-side-text" id="tutorialModalDesc">Conteúdo rápido, direto e organizado para o cliente achar o que precisa sem bagunça visual.</div>
+    </div>
+    <div class="tutorial-side-card">
+     <div class="tutorial-side-title">O que você vai ver</div>
+     <ul class="tutorial-side-list" id="tutorialModalChecklist"></ul>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
 <div class="popup-overlay" id="adminPopupOverlay">
  <div class="popup-card">
   <div class="popup-head"><div class="popup-badge" id="popupEmoji">📌</div><div><div class="popup-title" id="popupTitle">Aviso</div><div class="popup-sub">Administração BoxPower</div></div></div>
@@ -709,6 +719,169 @@ function showSection(name){
  document.getElementById('nav-'+name).classList.add('active');
  closeSidebar();
 }
+
+const TUTORIAL_GROUPS = [
+ {
+  id:'inicio',
+  icon:'🔓',
+  title:'Comece por aqui',
+  subtitle:'Os vídeos mais importantes para ativação e primeiros passos.',
+  items:[
+   {icon:'🔓', title:'Como acessar o portal pela primeira vez', desc:'Vídeo ideal para quem acabou de entrar e quer localizar acessos, PIN e produtos liberados.', tags:['Importante','Iniciante'], bullets:['Onde entrar com email e PIN','Como localizar seus produtos liberados','Onde ficam os avisos e pagamentos'], videoUrl:''},
+   {icon:'📱', title:'Como usar no celular sem erro', desc:'Atalho rápido mostrando login, cópia de credenciais e navegação no celular.', tags:['Dica rápida'], bullets:['Abrir o menu lateral no celular','Copiar acessos com um toque','Atualizar a tela sem se perder'], videoUrl:''},
+   {icon:'🛟', title:'Erros comuns e como resolver', desc:'Checklist simples para cliente se virar antes de chamar suporte.', tags:['Suporte'], bullets:['PIN incorreto','Produto sem ciclo válido','Quando falar com suporte'], videoUrl:''}
+  ]
+ },
+ {
+  id:'boxpower',
+  icon:'📦',
+  title:'BoxPower',
+  subtitle:'Tutorial de uso do portal principal e recursos da conta.',
+  items:[
+   {icon:'📦', title:'Como acessar o BoxPower', desc:'Passo a passo da entrada no portal e visualização dos recursos liberados.', tags:['Iniciante'], bullets:['Entrando pelo portal','Encontrando a credencial do produto','Entendendo a tela inicial'], videoUrl:''},
+   {icon:'⚙️', title:'Configuração básica e boas práticas', desc:'Organização inicial para o cliente aproveitar melhor a plataforma.', tags:['Intermediário'], bullets:['Boas práticas de uso','Como evitar erro de acesso','Como manter o fluxo organizado'], videoUrl:''},
+   {icon:'🚀', title:'Fluxo de uso no dia a dia', desc:'Exemplo rápido de como extrair mais valor do produto logo no primeiro uso.', tags:['Avançado'], bullets:['Rotina recomendada','Como ganhar velocidade','Onde achar o que mais usa'], videoUrl:''}
+  ]
+ },
+ {
+  id:'veo3',
+  icon:'🎬',
+  title:'VEO3',
+  subtitle:'Acesso, uso correto da conta e melhores práticas para evitar bloqueios.',
+  items:[
+   {icon:'🎬', title:'Como liberar e acessar o VEO3', desc:'Mostra o caminho de liberação, cópia das credenciais e entrada correta.', tags:['Importante'], bullets:['Clicar em liberar no momento certo','Entrar no Flow com a conta correta','Uso recomendado em aba anônima'], videoUrl:''},
+   {icon:'🧠', title:'Como montar prompts melhores', desc:'Tutorial rápido para o cliente sair do básico e gerar vídeos mais consistentes.', tags:['Prompt'], bullets:['Estrutura de prompt que funciona melhor','Como ser específico sem exagerar','Como iterar mais rápido'], videoUrl:''},
+   {icon:'🛡️', title:'Como evitar uso indevido e bloqueios', desc:'Explica as regras práticas de uso para não comprometer o acesso compartilhado.', tags:['Segurança'], bullets:['Condutas que bloqueiam a conta','Boas práticas em ambiente compartilhado','Quando parar e pedir ajuda'], videoUrl:''}
+  ]
+ },
+ {
+  id:'grok-chatgpt',
+  icon:'⚡',
+  title:'Grok & ChatGPT',
+  subtitle:'Tutoriais de IA conversacional, login e uso prático.',
+  items:[
+   {icon:'⚡', title:'Primeiro acesso ao Grok', desc:'Ensina como usar uma das credenciais vinculadas e começar sem travar.', tags:['Grok'], bullets:['Escolher uma credencial disponível','Fazer login sem confundir contas','Boas práticas iniciais'], videoUrl:''},
+   {icon:'🤖', title:'Como usar no dia a dia', desc:'Guia prático para prompts, pesquisa, escrita e suporte com IA.', tags:['ChatGPT'], bullets:['Prompts úteis do dia a dia','Pesquisa e escrita assistida','Quando refinar a pergunta'], videoUrl:''},
+   {icon:'💡', title:'Prompts prontos para tarefas comuns', desc:'Coleção de usos rápidos para acelerar o resultado do cliente.', tags:['Produtividade'], bullets:['Prompt para resumo','Prompt para atendimento','Prompt para ideias rápidas'], videoUrl:''}
+  ]
+ }
+];
+let activeTutorialGroupId = TUTORIAL_GROUPS[0]?.id || null;
+let currentTutorialItem = null;
+
+function renderTutorialShelves(){
+ const root=document.getElementById('tutorialAccordion');
+ if(!root) return;
+ root.innerHTML = TUTORIAL_GROUPS.map(group=>{
+  const isOpen = group.id === activeTutorialGroupId;
+  return `
+   <div class="card tutorial-shelf ${isOpen?'is-open':''}" id="tutorial-shelf-${group.id}">
+    <button class="tutorial-toggle" onclick="toggleTutorialShelf('${group.id}')">
+     <div class="tutorial-toggle-main">
+      <div class="tutorial-toggle-icon">${group.icon}</div>
+      <div>
+       <div class="tutorial-shelf-title">${group.title}</div>
+       <div class="tutorial-shelf-sub">${group.subtitle}</div>
+      </div>
+     </div>
+     <div class="tutorial-toggle-meta">
+      <span class="tutorial-count">${group.items.length} aulas</span>
+      <span class="tutorial-chevron"></span>
+     </div>
+    </button>
+    <div class="tutorial-panel">
+     <div class="tutorial-panel-inner">
+      <div class="tutorial-panel-content">
+       <div class="tutorial-grid">
+        ${group.items.map((item,idx)=>{
+          const hasVideo = !!String(item.videoUrl||'').trim();
+          return `
+           <div class="tutorial-card">
+            <div class="tutorial-thumb">${item.icon}</div>
+            <div class="tutorial-tags">${(item.tags||[]).map((tag,tagIdx)=>`<span class="tutorial-tag ${tagIdx===0?'primary':''}">${tag}</span>`).join('')}</div>
+            <div class="tutorial-card-title">${item.title}</div>
+            <div class="tutorial-card-desc">${item.desc}</div>
+            <div class="tutorial-card-actions">
+             <span class="tutorial-card-status">${hasVideo ? 'Player disponível' : 'Vídeo em breve'}</span>
+             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); openTutorialModal('${group.id}', ${idx})">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
+            </div>
+           </div>`;
+        }).join('')}
+       </div>
+       <div class="tutorial-empty">💡 <strong style="color:var(--text);">Organização nova:</strong> só uma categoria fica aberta por vez. Isso reduz poluição visual e facilita a navegação do cliente no celular.</div>
+      </div>
+     </div>
+    </div>
+   </div>`;
+ }).join('');
+}
+
+function toggleTutorialShelf(groupId){
+ activeTutorialGroupId = activeTutorialGroupId === groupId ? null : groupId;
+ renderTutorialShelves();
+}
+
+function normalizeTutorialEmbed(url){
+ const raw=String(url||'').trim();
+ if(!raw) return '';
+ try{
+  const u=new URL(raw);
+  if(u.hostname.includes('youtu.be')){
+   const id=u.pathname.replace(/^\//,'').split('/')[0];
+   return id ? `https://www.youtube.com/embed/${id}` : raw;
+  }
+  if(u.hostname.includes('youtube.com')){
+   const id=u.searchParams.get('v');
+   if(id) return `https://www.youtube.com/embed/${id}`;
+   if(u.pathname.includes('/embed/')) return raw;
+  }
+  return raw;
+ }catch(_){ return raw; }
+}
+
+function openTutorialModal(groupId, itemIndex){
+ const group=TUTORIAL_GROUPS.find(g=>g.id===groupId);
+ const item=group?.items?.[itemIndex];
+ if(!group || !item) return;
+ activeTutorialGroupId = groupId;
+ renderTutorialShelves();
+ currentTutorialItem = { group, item };
+ const overlay=document.getElementById('tutorialModalOverlay');
+ const frame=document.getElementById('tutorialPlayerFrame');
+ const actions=document.getElementById('tutorialPlayerActions');
+ document.getElementById('tutorialModalKicker').textContent = group.title.toUpperCase();
+ document.getElementById('tutorialModalTitle').textContent = item.title;
+ document.getElementById('tutorialModalSub').textContent = item.desc;
+ document.getElementById('tutorialModalDesc').textContent = item.desc;
+ document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
+ const embedUrl = normalizeTutorialEmbed(item.videoUrl);
+ if(embedUrl){
+  frame.innerHTML = `<iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir em nova aba</button>`;
+ } else {
+  frame.innerHTML = `<div class="tutorial-player-placeholder"><div style="font-size:2.1rem;">🧩</div><strong>Vídeo ainda não cadastrado</strong><span>Mas a estrutura do tutorial já está pronta. Quando o link for adicionado, ele abre aqui dentro do portal em modal, sem tirar o cliente da navegação.</span></div>`;
+  actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
+ }
+ if(overlay) overlay.classList.add('show');
+ document.body.style.overflow='hidden';
+}
+
+function closeTutorialModal(event){
+ if(event && event.target && event.target !== event.currentTarget) return;
+ const overlay=document.getElementById('tutorialModalOverlay');
+ const frame=document.getElementById('tutorialPlayerFrame');
+ if(overlay) overlay.classList.remove('show');
+ if(frame) frame.innerHTML = `<div class="tutorial-player-placeholder"><div style="font-size:2rem;">🎬</div><strong>Selecione um tutorial</strong><span>Quando o vídeo estiver vinculado, ele abre aqui dentro do portal.</span></div>`;
+ const actions=document.getElementById('tutorialPlayerActions');
+ if(actions) actions.innerHTML='';
+ document.body.style.overflow='';
+}
+
+window.addEventListener('keydown', (ev)=>{
+ if(ev.key==='Escape') closeTutorialModal();
+});
+
+renderTutorialShelves();
 
 /* ── MOBILE SIDEBAR ── */
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('show');}
