@@ -720,6 +720,7 @@ const TUTORIAL_GROUPS = [
   subtitle:'Acesso, uso correto da conta e melhores práticas para evitar bloqueios.',
   items:[
    {icon:'🕶️', title:'Como abrir uma aba anônima no Google Chrome (computador)', desc:'Tutorial rápido mostrando como abrir uma janela anônima no Chrome para usar os acessos do VEO3 com mais segurança.', tags:['Importante','Chrome'], bullets:['Abrir uma nova janela anônima no Chrome','Atalho rápido no computador','Usar o VEO3 sem misturar sessões'], videoUrl:'https://youtube.com/shorts/zucG-AMPg8I?si=tjD59ygF_nbJAAwf'},
+   {icon:'🌊', title:'Tutorial prático de Flow', desc:'Segundo vídeo da seção VEO3, reproduzido direto no portal via Google Drive.', tags:['Flow','Vídeo 2'], bullets:['Assistir sem sair do portal','Apoio visual para uso da Flow','Disponível no player interno'], videoUrl:'https://drive.google.com/file/d/1bdChj618xC1zlusWfjVP-Uvz4xDU6E4W/view?usp=drivesdk'},
    {icon:'🧠', title:'Como montar prompts melhores', desc:'Tutorial rápido para o cliente sair do básico e gerar vídeos mais consistentes.', tags:['Prompt'], bullets:['Estrutura de prompt que funciona melhor','Como ser específico sem exagerar','Como iterar mais rápido'], videoUrl:''},
    {icon:'🛡️', title:'Como evitar uso indevido e bloqueios', desc:'Explica as regras práticas de uso para não comprometer o acesso compartilhado.', tags:['Segurança'], bullets:['Condutas que bloqueiam a conta','Boas práticas em ambiente compartilhado','Quando parar e pedir ajuda'], videoUrl:''}
   ]
@@ -746,12 +747,17 @@ function renderTutorialCardMedia(groupId, item, idx){
  if(!rawUrl) return `<div class="tutorial-card-player"><div class="tutorial-card-player-placeholder">${item.icon}</div></div>`;
  const key = `${groupId}:${idx}`;
  const youtubeId = extractYouTubeVideoId(rawUrl);
+ const googleDriveId = extractGoogleDriveFileId(rawUrl);
  if(activeInlineTutorialKey === key){
   const embedUrl = buildTutorialEmbedUrl(item);
   return `<div class="tutorial-card-player"><iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
  }
  if(youtubeId){
   const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" /></button></div>`;
+ }
+ if(googleDriveId){
+  const thumb = `https://drive.google.com/thumbnail?id=${googleDriveId}&sz=w1600`;
   return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" /></button></div>`;
  }
  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
@@ -832,10 +838,19 @@ function extractYouTubeVideoId(url){
  return '';
 }
 
+function extractGoogleDriveFileId(url){
+ const raw=String(url||'').trim();
+ if(!raw) return '';
+ const match = raw.match(/drive\.google\.com\/file\/d\/([^\/]+)/i);
+ return match?.[1] || '';
+}
+
 function buildTutorialEmbedUrl(item){
  const rawUrl = String(item?.videoUrl||'').trim();
  const youtubeId = extractYouTubeVideoId(rawUrl);
  if(youtubeId) return `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+ const googleDriveId = extractGoogleDriveFileId(rawUrl);
+ if(googleDriveId) return `https://drive.google.com/file/d/${googleDriveId}/preview`;
  return rawUrl;
 }
 
