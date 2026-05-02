@@ -248,7 +248,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-modal-close:hover{color:var(--text);border-color:rgba(255,255,255,0.18);}
 .tutorial-modal-body{padding:18px 22px 22px;overflow:auto;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,0.85fr);gap:18px;}
 .tutorial-player-shell{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:14px;min-height:360px;}
-.tutorial-player-frame{position:relative;padding-top:56.25%;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);}
+.tutorial-player-frame{position:relative;padding-top:56.25%;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);min-height:220px;}
 .tutorial-player-frame iframe,.tutorial-player-frame video,.tutorial-player-placeholder,.tutorial-player-thumb{position:absolute;inset:0;width:100%;height:100%;}
 .tutorial-player-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted2);gap:10px;}
 .tutorial-player-placeholder strong{color:var(--text);font-size:1rem;}
@@ -256,6 +256,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .tutorial-player-thumb::after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(4,7,15,0.78);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:1.8rem;box-shadow:0 18px 44px rgba(0,0,0,0.35);backdrop-filter:blur(8px);}
 .tutorial-player-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.tutorial-mobile-cta{display:none;}
+.tutorial-mobile-cta .tutorial-btn{width:100%;height:44px;font-size:0.88rem;justify-content:center;}
 .tutorial-modal-side{display:flex;flex-direction:column;gap:14px;}
 .tutorial-side-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:18px;padding:16px;}
 .tutorial-side-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;margin-bottom:10px;}
@@ -313,6 +315,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .tutorial-modal-title{font-size:1rem;}
  .tutorial-modal-body{grid-template-columns:1fr;padding:14px 18px 18px;gap:14px;}
  .tutorial-player-shell{min-height:auto;padding:12px;}
+ .tutorial-player-frame{display:none;}
+ .tutorial-mobile-cta{display:block;}
  .tutorial-player-actions{flex-direction:column;}
  .tutorial-player-actions .tutorial-btn{width:100%;justify-content:center;}
  .tutorial-modal-side{gap:12px;}
@@ -889,7 +893,7 @@ function openTutorialModal(groupId, itemIndex){
  document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
  frame.innerHTML = renderTutorialMedia(item);
  if(String(item.videoUrl||'').trim()){
-  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button>`;
+  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button><div class="tutorial-mobile-cta"><button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir vídeo no YouTube</button></div>`;
  } else {
   actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
  }

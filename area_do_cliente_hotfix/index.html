@@ -244,6 +244,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .tutorial-modal-title{font-size:1rem;}
  .tutorial-modal-body{grid-template-columns:1fr;padding:14px 18px 18px;gap:14px;}
  .tutorial-player-shell{min-height:auto;padding:12px;}
+ .tutorial-player-frame{display:none;}
+ .tutorial-mobile-cta{display:block;}
  .tutorial-player-actions{flex-direction:column;}
  .tutorial-player-actions .tutorial-btn{width:100%;justify-content:center;}
  .tutorial-modal-side{gap:12px;}
@@ -820,7 +822,7 @@ function openTutorialModal(groupId, itemIndex){
  document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
  frame.innerHTML = renderTutorialMedia(item);
  if(String(item.videoUrl||'').trim()){
-  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button>`;
+  actions.innerHTML = `<button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Assistir vídeo</button><div class="tutorial-mobile-cta"><button class="tutorial-btn" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir vídeo no YouTube</button></div>`;
  } else {
   actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
  }
