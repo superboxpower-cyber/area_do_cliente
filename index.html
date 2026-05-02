@@ -225,7 +225,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-height:210px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
 .tutorial-card-player{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);margin-bottom:2px;}
 .tutorial-card-player iframe,.tutorial-card-player-thumb,.tutorial-card-player-placeholder{position:absolute;inset:0;width:100%;height:100%;}
-.tutorial-card-player-thumb{display:block;border:none;padding:0;background:#050816;cursor:pointer;}
+.tutorial-card-player-thumb{display:block;border:none;padding:0;background:#050816;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .tutorial-card-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .tutorial-card-player-thumb::after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(4,7,15,0.78);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:1.6rem;box-shadow:0 18px 44px rgba(0,0,0,0.35);backdrop-filter:blur(8px);}
 .tutorial-card-player-placeholder{display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:1.9rem;}
@@ -238,22 +238,12 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-card-desc{font-size:0.76rem;color:var(--muted2);line-height:1.55;flex:1;}
 .tutorial-card-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
 .tutorial-card-status{font-size:0.68rem;color:var(--muted);font-weight:600;}
-.tutorial-btn{height:34px;padding:0 14px;border-radius:10px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s ease;}
+.tutorial-btn{height:40px;padding:0 16px;border-radius:12px;border:1px solid rgba(16,185,129,0.2);background:rgba(16,185,129,0.08);color:var(--green);font-size:0.8rem;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .tutorial-btn:hover{transform:translateY(-1px);border-color:rgba(16,185,129,0.35);}
 .tutorial-btn.secondary{border-color:var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);}
 .tutorial-btn.secondary:hover{color:var(--text);border-color:rgba(255,255,255,0.18);}
 .tutorial-empty{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.025);border:1px dashed rgba(255,255,255,0.09);font-size:0.76rem;color:var(--muted2);line-height:1.6;}
-.tutorial-modal-overlay{position:fixed;inset:0;background:rgba(4,7,15,0.82);backdrop-filter:blur(16px);z-index:9600;display:none;align-items:center;justify-content:center;padding:20px;}
-.tutorial-modal-overlay.show{display:flex;animation:fadeIn2 .25s ease both;}
-.tutorial-modal{width:min(960px,100%);max-height:min(88vh,900px);overflow:hidden;background:rgba(10,15,28,0.97);border:1px solid rgba(255,255,255,0.09);border-radius:28px;box-shadow:0 40px 100px rgba(0,0,0,0.72);display:flex;flex-direction:column;}
-.tutorial-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 22px 14px;border-bottom:1px solid rgba(255,255,255,0.06);}
-.tutorial-modal-kicker{font-size:0.68rem;color:var(--green);text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:8px;}
-.tutorial-modal-title{font-size:1.18rem;font-weight:800;line-height:1.2;}
 .tutorial-modal-sub{font-size:0.78rem;color:var(--muted2);line-height:1.6;margin-top:6px;}
-.tutorial-modal-close{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted2);cursor:pointer;font-size:1.2rem;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.tutorial-modal-close:hover{color:var(--text);border-color:rgba(255,255,255,0.18);}
-.tutorial-modal-body{padding:18px 22px 22px;overflow:auto;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,0.85fr);gap:18px;}
-.tutorial-player-shell{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:14px;min-height:360px;}
 .tutorial-player-frame{position:relative;padding-top:56.25%;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(139,92,246,0.08));border:1px solid rgba(255,255,255,0.06);min-height:220px;}
 .tutorial-player-frame iframe,.tutorial-player-frame video,.tutorial-player-placeholder,.tutorial-player-thumb{position:absolute;inset:0;width:100%;height:100%;}
 .tutorial-player-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted2);gap:10px;}
@@ -261,15 +251,6 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .tutorial-player-thumb{display:block;background:#050816;border:none;padding:0;cursor:pointer;}
 .tutorial-player-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .tutorial-player-thumb::after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(4,7,15,0.78);border:1px solid rgba(255,255,255,0.14);color:#fff;font-size:1.8rem;box-shadow:0 18px 44px rgba(0,0,0,0.35);backdrop-filter:blur(8px);}
-.tutorial-player-actions{display:flex;gap:10px;flex-wrap:wrap;}
-.tutorial-mobile-cta{display:none;}
-.tutorial-mobile-cta .tutorial-btn{width:100%;height:44px;font-size:0.88rem;justify-content:center;}
-.tutorial-modal-side{display:flex;flex-direction:column;gap:14px;}
-.tutorial-side-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:18px;padding:16px;}
-.tutorial-side-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;margin-bottom:10px;}
-.tutorial-side-text{font-size:0.82rem;color:var(--muted2);line-height:1.7;}
-.tutorial-side-list{padding-left:16px;color:var(--muted2);display:flex;flex-direction:column;gap:8px;font-size:0.8rem;line-height:1.6;}
-.tutorial-side-list li strong{color:var(--text);}
 
 .popup-overlay.show{display:flex;animation:fadeIn2 .25s ease both;}
 @keyframes fadeIn2{from{opacity:0}to{opacity:1}}
@@ -314,18 +295,8 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
  .tutorial-panel-content{padding:0 18px 18px;}
  .tutorial-grid{grid-template-columns:1fr;}
  .tutorial-card{min-height:auto;}
- .tutorial-card-actions{align-items:flex-start;flex-direction:column;}
- .tutorial-modal-overlay{padding:10px;}
- .tutorial-modal{width:100%;max-height:92vh;border-radius:22px;}
- .tutorial-modal-head{padding:18px 18px 12px;}
- .tutorial-modal-title{font-size:1rem;}
- .tutorial-modal-body{grid-template-columns:1fr;padding:14px 18px 18px;gap:14px;}
- .tutorial-player-shell{min-height:auto;padding:12px;}
- .tutorial-player-frame{display:none;}
- .tutorial-mobile-cta{display:block;}
- .tutorial-player-actions{flex-direction:column;}
- .tutorial-player-actions .tutorial-btn{width:100%;justify-content:center;}
- .tutorial-modal-side{gap:12px;}
+ .tutorial-card-actions{align-items:stretch;flex-direction:column;}
+ .tutorial-card-actions .tutorial-btn{width:100%;justify-content:center;}
 }
 .mobile-topbar{display:none;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(4,7,15,0.85);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);margin:-16px -16px 16px;}
 .hamburger{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--glass2);color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -638,7 +609,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
    <div class="section-title">Central de Tutoriais</div>
    <div class="section-sub">Aprenda a usar suas ferramentas com vídeos rápidos, diretos e organizados por produto.</div>
    <div class="tutorial-toolbar">
-    <div class="tutorial-toolbar-note">Selecione uma categoria e abra o tutorial que quiser assistir dentro do próprio portal.</div>
+    <div class="tutorial-toolbar-note">Selecione uma categoria e toque no tutorial para assistir sem sair do portal.</div>
     <div class="tutorial-pill">Tutoriais por produto</div>
    </div>
    <div class="tutorial-accordion" id="tutorialAccordion"></div>
@@ -685,41 +656,6 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="tutorial-modal-overlay" id="tutorialModalOverlay" onclick="closeTutorialModal(event)">
- <div class="tutorial-modal" onclick="event.stopPropagation()">
-  <div class="tutorial-modal-head">
-   <div>
-    <div class="tutorial-modal-kicker" id="tutorialModalKicker">Tutorial</div>
-    <div class="tutorial-modal-title" id="tutorialModalTitle">Central de Tutoriais</div>
-    <div class="tutorial-modal-sub" id="tutorialModalSub">Abra um tutorial organizado sem sair do portal.</div>
-   </div>
-   <button class="tutorial-modal-close" onclick="closeTutorialModal()">×</button>
-  </div>
-  <div class="tutorial-modal-body">
-   <div class="tutorial-player-shell">
-    <div class="tutorial-player-frame" id="tutorialPlayerFrame">
-     <div class="tutorial-player-placeholder">
-      <div style="font-size:2rem;">🎬</div>
-      <strong>Selecione um tutorial</strong>
-      <span>Quando o vídeo estiver vinculado, ele abre aqui dentro do portal.</span>
-     </div>
-    </div>
-    <div class="tutorial-player-actions" id="tutorialPlayerActions"></div>
-   </div>
-   <div class="tutorial-modal-side">
-    <div class="tutorial-side-card">
-     <div class="tutorial-side-title">Resumo</div>
-     <div class="tutorial-side-text" id="tutorialModalDesc">Conteúdo rápido, direto e organizado para o cliente achar o que precisa sem bagunça visual.</div>
-    </div>
-    <div class="tutorial-side-card">
-     <div class="tutorial-side-title">O que você vai ver</div>
-     <ul class="tutorial-side-list" id="tutorialModalChecklist"></ul>
-    </div>
-   </div>
-  </div>
- </div>
-</div>
-
 <div class="popup-overlay" id="adminPopupOverlay">
  <div class="popup-card">
   <div class="popup-head"><div class="popup-badge" id="popupEmoji">📌</div><div><div class="popup-title" id="popupTitle">Aviso</div><div class="popup-sub">Administração BoxPower</div></div></div>
@@ -817,7 +753,7 @@ function renderTutorialCardMedia(groupId, item, idx){
   const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
   return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-card-player-placeholder\">🎬</div>';" /></button></div>`;
  }
-  return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
+ return `<div class="tutorial-card-player"><button class="tutorial-card-player-thumb" type="button" onclick="event.stopPropagation(); toggleInlineTutorialPlayer('${groupId}', ${idx})"><div class=\"tutorial-card-player-placeholder\">🎬</div></button></div>`;
 }
 
 function toggleInlineTutorialPlayer(groupId, idx){
@@ -853,6 +789,7 @@ function renderTutorialShelves(){
        <div class="tutorial-grid">
         ${group.items.map((item,idx)=>{
           const hasVideo = !!String(item.videoUrl||'').trim();
+          const isPlaying = activeInlineTutorialKey === `${group.id}:${idx}`;
           return `
            <div class="tutorial-card">
             ${renderTutorialCardMedia(group.id, item, idx)}
@@ -860,8 +797,8 @@ function renderTutorialShelves(){
             <div class="tutorial-card-title">${item.title}</div>
             <div class="tutorial-card-desc">${item.desc}</div>
             <div class="tutorial-card-actions">
-             <span class="tutorial-card-status">${hasVideo ? 'Player disponível' : 'Vídeo em breve'}</span>
-             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); ${hasVideo ? `toggleInlineTutorialPlayer('${group.id}', ${idx})` : `openTutorialModal('${group.id}', ${idx})`}">${hasVideo ? 'Abrir player' : 'Ver conteúdo'}</button>
+             <span class="tutorial-card-status">${hasVideo ? (isPlaying ? 'Reproduzindo no portal' : 'Player disponível') : 'Vídeo em breve'}</span>
+             <button class="tutorial-btn ${hasVideo?'':'secondary'}" onclick="event.stopPropagation(); ${hasVideo ? `toggleInlineTutorialPlayer('${group.id}', ${idx})` : `return false`}">${hasVideo ? (isPlaying ? 'Fechar player' : 'Assistir aqui') : 'Em breve'}</button>
             </div>
            </div>`;
         }).join('')}
@@ -900,68 +837,6 @@ function buildTutorialEmbedUrl(item){
  if(youtubeId) return `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
  return rawUrl;
 }
-
-function renderTutorialMedia(item){
- const rawUrl = String(item?.videoUrl||'').trim();
- if(!rawUrl){
-  return `<div class="tutorial-player-placeholder"><div style="font-size:2.1rem;">🧩</div><strong>Vídeo ainda não cadastrado</strong><span>Mas a estrutura do tutorial já está pronta. Quando o link for adicionado, ele abre aqui dentro do portal sem tirar o cliente da navegação.</span></div>`;
- }
- const youtubeId = extractYouTubeVideoId(rawUrl);
- if(youtubeId){
-  const thumb = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
-  return `<button class="tutorial-player-thumb" type="button" onclick="playTutorialInline()" aria-label="Assistir tutorial dentro do portal"><img src="${thumb}" alt="Capa do tutorial ${item.title}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=\"tutorial-player-placeholder\"><div style=\"font-size:2rem;\">🎬</div><strong>Assistir dentro do portal</strong><span>Toque no botão abaixo para abrir o player incorporado.</span></div>';" /></button>`;
- }
- return `<iframe src="${rawUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-}
-
-function playTutorialInline(){
- if(!currentTutorialItem?.item) return;
- const frame=document.getElementById('tutorialPlayerFrame');
- const item=currentTutorialItem.item;
- const embedUrl = buildTutorialEmbedUrl(item);
- if(!embedUrl || !frame) return;
- frame.innerHTML = `<iframe src="${embedUrl}" title="${item.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-}
-
-function openTutorialModal(groupId, itemIndex){
- const group=TUTORIAL_GROUPS.find(g=>g.id===groupId);
- const item=group?.items?.[itemIndex];
- if(!group || !item) return;
- activeTutorialGroupId = groupId;
- renderTutorialShelves();
- currentTutorialItem = { group, item };
- const overlay=document.getElementById('tutorialModalOverlay');
- const frame=document.getElementById('tutorialPlayerFrame');
- const actions=document.getElementById('tutorialPlayerActions');
- document.getElementById('tutorialModalKicker').textContent = group.title.toUpperCase();
- document.getElementById('tutorialModalTitle').textContent = item.title;
- document.getElementById('tutorialModalSub').textContent = item.desc;
- document.getElementById('tutorialModalDesc').textContent = item.desc;
- document.getElementById('tutorialModalChecklist').innerHTML = (item.bullets||[]).map(line=>`<li>${line}</li>`).join('');
- frame.innerHTML = renderTutorialMedia(item);
- if(String(item.videoUrl||'').trim()){
-  actions.innerHTML = `<button class="tutorial-btn" onclick="playTutorialInline()">Assistir vídeo</button><div class="tutorial-mobile-cta"><button class="tutorial-btn" onclick="playTutorialInline()">Reproduzir no portal</button></div><button class="tutorial-btn secondary" onclick="window.open('${item.videoUrl}','_blank','noopener')">Abrir no YouTube</button>`;
- } else {
-  actions.innerHTML = `<button class="tutorial-btn secondary" onclick="closeTutorialModal()">Fechar</button>`;
- }
- if(overlay) overlay.classList.add('show');
- document.body.style.overflow='hidden';
-}
-
-function closeTutorialModal(event){
- if(event && event.target && event.target !== event.currentTarget) return;
- const overlay=document.getElementById('tutorialModalOverlay');
- const frame=document.getElementById('tutorialPlayerFrame');
- if(overlay) overlay.classList.remove('show');
- if(frame) frame.innerHTML = `<div class="tutorial-player-placeholder"><div style="font-size:2rem;">🎬</div><strong>Selecione um tutorial</strong><span>Quando o vídeo estiver vinculado, ele abre aqui dentro do portal.</span></div>`;
- const actions=document.getElementById('tutorialPlayerActions');
- if(actions) actions.innerHTML='';
- document.body.style.overflow='';
-}
-
-window.addEventListener('keydown', (ev)=>{
- if(ev.key==='Escape') closeTutorialModal();
-});
 
 renderTutorialShelves();
 
