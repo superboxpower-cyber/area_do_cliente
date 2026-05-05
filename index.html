@@ -891,9 +891,7 @@ async function fetchPortalState(email, pin){
     method: 'POST',
     cache: 'no-store',
     headers: {
-     'Content-Type': 'application/json',
-     'Cache-Control': 'no-store, no-cache, must-revalidate',
-     'Pragma': 'no-cache'
+     'Content-Type': 'application/json'
     },
     body: JSON.stringify({ email, pin })
    });
