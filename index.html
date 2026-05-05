@@ -884,19 +884,28 @@ function togglePass(){
 (function(){try{const s=localStorage.getItem('bp_creds');if(!s)return;const{e,p}=JSON.parse(s);document.getElementById('loginEmail').value=e||'';document.getElementById('loginPass').value=p||'';document.getElementById('rememberMe').checked=true;}catch(_){}})();
 
 async function fetchPortalState(email, pin){
- const response = await fetch(`${PORTAL_LOGIN_URL}?ts=${Date.now()}`, {
-  method: 'POST',
-  cache: 'no-store',
-  headers: {
-   'Content-Type': 'application/json',
-   'Cache-Control': 'no-store, no-cache, must-revalidate',
-   'Pragma': 'no-cache'
-  },
-  body: JSON.stringify({ email, pin })
- });
- let payload = null;
- try { payload = await response.json(); } catch(_) {}
- return { response, payload };
+ let lastErr = null;
+ for (let attempt = 0; attempt < 3; attempt++) {
+  try {
+   const response = await fetch(`${PORTAL_LOGIN_URL}?ts=${Date.now()}`, {
+    method: 'POST',
+    cache: 'no-store',
+    headers: {
+     'Content-Type': 'application/json',
+     'Cache-Control': 'no-store, no-cache, must-revalidate',
+     'Pragma': 'no-cache'
+    },
+    body: JSON.stringify({ email, pin })
+   });
+   let payload = null;
+   try { payload = await response.json(); } catch(_) {}
+   return { response, payload };
+  } catch (err) {
+   lastErr = err;
+   if (attempt < 2) await new Promise(r => setTimeout(r, 350 * (attempt + 1)));
+  }
+ }
+ throw lastErr || new Error('fetch_failed');
 }
 
 async function syncCurrentPortalState(){
