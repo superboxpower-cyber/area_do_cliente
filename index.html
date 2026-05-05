@@ -3,10 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Portal Hub · Central do Assinante</title>
 <link rel="canonical" href="https://boxpower.store/">
 <script>
-if (window.location.hostname === 'superboxpower-cyber.github.io') {
+if (window.location.protocol === 'http:' && window.location.hostname === 'boxpower.store') {
+  window.location.replace(`https://boxpower.store${window.location.pathname}${window.location.search}${window.location.hash}`);
+} else if (window.location.hostname === 'superboxpower-cyber.github.io') {
   window.location.replace('https://boxpower.store/');
 }
 </script>
