@@ -889,7 +889,6 @@ async function fetchPortalState(email, pin){
   cache: 'no-store',
   headers: {
    'Content-Type': 'application/json',
-   'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN,
    'Cache-Control': 'no-store, no-cache, must-revalidate',
    'Pragma': 'no-cache'
   },
@@ -1634,8 +1633,7 @@ async function sendPortalLoginLog(payload){
     await fetch(PORTAL_LOGIN_LOG_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     });
