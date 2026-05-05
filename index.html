@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal Hub · Central do Assinante</title>
+<link rel="canonical" href="https://boxpower.store/">
+<meta http-equiv="refresh" content="0; url=https://boxpower.store/">
 <script>
 if (window.location.hostname === 'superboxpower-cyber.github.io') {
   window.location.replace('https://boxpower.store/');
@@ -883,11 +885,14 @@ function togglePass(){
 (function(){try{const s=localStorage.getItem('bp_creds');if(!s)return;const{e,p}=JSON.parse(s);document.getElementById('loginEmail').value=e||'';document.getElementById('loginPass').value=p||'';document.getElementById('rememberMe').checked=true;}catch(_){}})();
 
 async function fetchPortalState(email, pin){
- const response = await fetch(PORTAL_LOGIN_URL, {
+ const response = await fetch(`${PORTAL_LOGIN_URL}?ts=${Date.now()}`, {
   method: 'POST',
+  cache: 'no-store',
   headers: {
    'Content-Type': 'application/json',
-   'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN
+   'Authorization': 'Bearer ' + VEO_OPTIMIZER_TOKEN,
+   'Cache-Control': 'no-store, no-cache, must-revalidate',
+   'Pragma': 'no-cache'
   },
   body: JSON.stringify({ email, pin })
  });
@@ -903,7 +908,7 @@ async function syncCurrentPortalState(){
   if(!response.ok || !payload?.ok || !payload?.result || payload?.result?.error){
    return { ok:false, error:String(payload?.error || payload?.result?.error || 'sync_failed') };
   }
-  currentClient = { ...currentClient, ...payload.result };
+  currentClient = payload.result;
   return { ok:true, result: currentClient, integrity: payload.integrity || null };
  }catch(err){
   return { ok:false, error:String(err && err.message || err || 'sync_failed') };
@@ -1250,7 +1255,7 @@ async function loadProducts(client){
             <div class="cred-val"><span class="dots-anim" id="dots-view">• • • • • • • • •</span><span id="pass-val" style="display:none;">${client.adspower_password||''}</span></div>
             <div class="field-actions">
              <span class="reveal-timer" id="timer-lbl"></span>
-             <button class="btn-reveal" id="reveal-btn" onclick="revealPassword()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
+             <button class="btn-reveal" id="reveal-btn" onclick="revealPassword(${slotIndex})"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Liberar</button>
             </div>
            </div>
           </div>
@@ -1260,9 +1265,8 @@ async function loadProducts(client){
        // VEO3 SHARED — credenciais do Google Flow
        const veoEmail = c.veo3_email || '';
        const veoPass  = c.veo3_password || '';
-       // Force cache-bust on currentClient re-read
-       const _veoSafe = veoEmail || (currentClient?.veo3_email) || '';
-       const _veoPassSafe = veoPass || (currentClient?.veo3_password) || '';
+       const _veoSafe = veoEmail;
+       const _veoPassSafe = veoPass;
        if (_isBlockedProduct) {
          html += `
          <div class="cred-fields">
@@ -1439,8 +1443,18 @@ async function loadPayments(client){
   const lMap={paid:'✅ Pago',pending:'⏳ Pendente',late:'⚠️ Atrasado'};
   const fmtM=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const fmtD=s=>{if(!s||s==='-')return'—';const d=s.includes('T')?new Date(s):new Date(s+'T12:00:00');return isNaN(d.getTime())?'—':d.toLocaleDateString('pt-BR');};
+  const dedupedPays=[];
+  const seenPayKeys=new Set();
+  for(const p of pays){
+   const refMonth=(p.reference_month||String(p.payment_date||'').slice(0,7)||'').trim();
+   const amountKey=Number(p.amount||0).toFixed(2);
+   const key=[p.product_id||'no-product',refMonth,amountKey,String(p.status||'').toLowerCase()].join('|');
+   if(seenPayKeys.has(key)) continue;
+   seenPayKeys.add(key);
+   dedupedPays.push(p);
+  }
   let totalP=0,totalPending=0;
-  const rows=pays.map(p=>{
+  const rows=dedupedPays.map(p=>{
    const st=stMap[p.status]||'pending';
    if(st==='paid')totalP+=Number(p.amount||0);
    else if(st==='pending')totalPending+=Number(p.amount||0);
@@ -1449,7 +1463,7 @@ async function loadPayments(client){
   tbody.innerHTML=rows;
   setEl('sumPaid',Number(totalP).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
   setEl('sumPending',Number(totalPending).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
-  setEl('sumMonths',String(pays.length));
+  setEl('sumMonths',String(dedupedPays.length));
   if(totalPending>0){document.getElementById('pendingBadge').style.display='inline';}
  }catch(e){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">Erro ao carregar.</td></tr>';console.warn(e);}
 }
@@ -1562,10 +1576,10 @@ async function revealPortalCredential(opts={}){
  finally{if(rb)rb.disabled=false;}
 }
 
-async function revealPassword(){
+async function revealPassword(slotIndex=1){
  const rb=document.getElementById('reveal-btn');if(rb)rb.disabled=true;
  try{
-  await revealPortalCredential({ kind:'boxpower', productId:'1c13544a-1435-4071-a10a-566e80cad327', slotIndex:1, emailFieldId:'ads-profile-id', passFieldId:'pass-val', dotsFieldId:'dots-view', copyBtnId:'copy-pass', buttonId:'reveal-btn', timerId:'timer-lbl' });
+  await revealPortalCredential({ kind:'boxpower', productId:'1c13544a-1435-4071-a10a-566e80cad327', slotIndex:Number(slotIndex)||1, emailFieldId:'ads-profile-id', passFieldId:'pass-val', dotsFieldId:'dots-view', copyBtnId:'copy-pass', buttonId:'reveal-btn', timerId:'timer-lbl' });
  }catch(e){toast('Erro ao liberar senha.','warn');}
  finally{if(rb)rb.disabled=false;}
 }
