@@ -1307,9 +1307,16 @@ async function loadProducts(client){
            </div>
            <div class="cred-field full" style="text-align:center;padding-top:4px;">
              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;">Use sempre em aba anônima • Modelo: <strong>Veo 3.1 – Fast [Lower Priority]</strong></div>
-             <a href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">
-               <button class="btn-login" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;">🚀 Ir para o Flow</button>
-             </a>
+             <div id="veo3-code-box" style="display:none;margin:0 auto 12px;padding:13px 14px;border-radius:16px;border:1px solid rgba(16,185,129,.28);background:rgba(16,185,129,.08);max-width:320px;">
+               <div style="font-size:.72rem;color:var(--muted2);font-weight:700;margin-bottom:6px;">Código Google expira em <span id="veo3-code-timer">--</span>s</div>
+               <div id="veo3-code-val" style="font-family:'DM Mono',monospace;font-size:1.6rem;letter-spacing:.18em;color:var(--green);font-weight:900;">------</div>
+             </div>
+             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+               <button class="btn-login" id="veo3-code-btn" onclick="requestVeo3Code(${slotIndex})" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;background:linear-gradient(135deg,#10B981,#06B6D4);">🔐 Pegar código</button>
+               <a href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">
+                 <button class="btn-login" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;">🚀 Ir para o Flow</button>
+               </a>
+             </div>
            </div>
          </div>`;
        }
@@ -1586,6 +1593,60 @@ async function revealPortalCredential(opts={}){
  finally{if(rb)rb.disabled=false;}
 }
 
+let veo3CodeCountdownTimer = null;
+
+async function requestVeo3Code(slotIndex=1){
+ const btn=document.getElementById('veo3-code-btn');
+ const box=document.getElementById('veo3-code-box');
+ const val=document.getElementById('veo3-code-val');
+ const timer=document.getElementById('veo3-code-timer');
+ if(btn) btn.disabled=true;
+ try{
+  if(!currentClient?.email || !currentPin){ toast('Faça login novamente.','warn'); return; }
+  const syncRes = await syncCurrentPortalState();
+  if(!syncRes.ok || !currentClient){ toast('Erro ao validar acesso. Faça login novamente.','warn'); return; }
+  const productState = getPortalProductState(slotIndex, '01ccb898-f88f-4bd3-8bd9-33650abf961c', currentClient);
+  if(productState?.cycle?.expired){ toast('Assinatura vencida. Renove para pegar código.','warn'); return; }
+  if(productState?.missing_cycle){ toast('Produto bloqueado no portal.','warn'); return; }
+  if(btn) btn.textContent='⏳ Gerando...';
+  const response = await fetch(`${PORTAL_VEO_CODE_URL}?ts=${Date.now()}`, {
+   method:'POST',
+   cache:'no-store',
+   headers:{'Content-Type':'application/json'},
+   body: JSON.stringify({ email: currentClient.email, pin: currentPin })
+  });
+  let payload=null;try{payload=await response.json();}catch(_){ }
+  if(!response.ok || !payload?.ok){
+   const err=String(payload?.error || 'code_failed');
+   const map={
+    invalid_credentials:'Sessão inválida. Faça login novamente.',
+    veo_inactive_or_expired:'VEO3 vencido ou inativo.',
+    missing_veo_secret:'Código ainda não cadastrado nesta credencial. Chame o suporte.',
+    rate_limited:'Limite de segurança atingido. Tente novamente mais tarde.',
+    totp_generation_failed:'Falha ao gerar código. Tente novamente.'
+   };
+   toast(map[err] || 'Não consegui gerar o código agora.','warn');
+   return;
+  }
+  if(box) box.style.display='block';
+  if(val) val.textContent=String(payload.code || '') || '------';
+  let secs=Math.max(1, Number(payload.remainingSeconds || 30));
+  if(timer) timer.textContent=String(secs);
+  if(veo3CodeCountdownTimer) clearInterval(veo3CodeCountdownTimer);
+  veo3CodeCountdownTimer=setInterval(()=>{
+   secs--;
+   if(timer) timer.textContent=String(Math.max(0, secs));
+   if(secs<=0){
+    clearInterval(veo3CodeCountdownTimer);veo3CodeCountdownTimer=null;
+    if(box) box.style.display='none';
+    if(val) val.textContent='------';
+   }
+  },1000);
+  try{await navigator.clipboard.writeText(String(payload.code || ''));showToast('Código gerado e copiado!');}catch(_){showToast('Código gerado!');}
+ }catch(e){toast('Erro ao gerar código. Tente novamente.','warn');}
+ finally{if(btn){btn.disabled=false;btn.textContent='🔐 Pegar código';}}
+}
+
 async function revealPassword(slotIndex=1){
  const rb=document.getElementById('reveal-btn');if(rb)rb.disabled=true;
  try{
@@ -1638,6 +1699,7 @@ function setEl(id,val){const el=document.getElementById(id);if(el)el.textContent
 const VEO_OPTIMIZER_URL = 'https://api.boxpower.store/veo/optimize';
 const PORTAL_LOGIN_URL = 'https://api.boxpower.store/portal/login';
 const PORTAL_LOGIN_LOG_URL = 'https://api.boxpower.store/portal/login-log';
+const PORTAL_VEO_CODE_URL = 'https://api.boxpower.store/portal/veo-code';
 const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
 
 async function sendPortalLoginLog(payload){
