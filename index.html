@@ -41,7 +41,9 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 @keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-25px)}}
 .ambient::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(16,185,129,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.025) 1px,transparent 1px);background-size:50px 50px;}
 /* LAYOUT */
-#app{display:flex;min-height:100vh;position:relative;z-index:1;}
+#app{display:none;min-height:100vh;position:relative;z-index:1;}
+body.is-authenticated #app{display:flex;}
+body.client-login-open #loginScreen{display:flex;}
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);min-height:100vh;background:rgba(4,7,15,0.8);border-right:1px solid var(--border);backdrop-filter:blur(24px);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:200;}
 .sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
@@ -177,8 +179,45 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 .toast::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
 .toast.warn{color:var(--amber);border-color:rgba(245,158,11,0.25);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PUBLIC HOME STRUCTURE */
+#publicHome{min-height:100vh;position:relative;z-index:1;padding:24px;display:flex;flex-direction:column;}
+.public-shell{width:min(1180px,100%);margin:0 auto;display:flex;flex-direction:column;min-height:calc(100vh - 48px);}
+.public-nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 18px;border:1px solid var(--border);border-radius:24px;background:rgba(4,7,15,0.72);backdrop-filter:blur(24px);box-shadow:0 24px 70px rgba(0,0,0,0.28);}
+.public-brand{display:flex;align-items:center;gap:12px;min-width:0;}
+.public-brand img{width:46px;height:46px;border-radius:14px;border:1px solid rgba(16,185,129,0.28);object-fit:cover;box-shadow:0 0 24px rgba(16,185,129,0.16);}
+.public-brand-title{font-weight:900;font-size:1.08rem;letter-spacing:-.03em;}
+.public-brand-sub{font-size:.66rem;color:var(--green);font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
+.public-menu{display:flex;align-items:center;gap:12px;}
+.public-menu a{color:var(--muted2);font-weight:700;font-size:.86rem;text-decoration:none;padding:10px 12px;border-radius:12px;transition:.2s;}
+.public-menu a:hover{color:var(--text);background:rgba(255,255,255,.055);}
+.public-client-btn{height:48px;border:0;border-radius:15px;padding:0 20px;background:linear-gradient(135deg,#10B981,#7C3AED);color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:.88rem;letter-spacing:.03em;cursor:pointer;box-shadow:0 12px 36px rgba(16,185,129,.28),inset 0 1px 0 rgba(255,255,255,.18);transition:.2s;white-space:nowrap;}
+.public-client-btn:hover{transform:translateY(-2px);box-shadow:0 18px 44px rgba(16,185,129,.36);}
+.public-hero{flex:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);align-items:center;gap:34px;padding:72px 6px 40px;}
+.public-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(16,185,129,.22);background:rgba(16,185,129,.08);color:var(--green);font-size:.7rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px;}
+.public-kicker::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);}
+.public-hero h1{font-size:clamp(2.35rem,6vw,5.6rem);line-height:.94;letter-spacing:-.07em;font-weight:900;max-width:820px;margin-bottom:22px;}
+.public-hero h1 span{background:linear-gradient(135deg,#10B981,#06B6D4,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.public-hero p{font-size:clamp(1rem,2vw,1.18rem);line-height:1.75;color:var(--muted2);max-width:680px;margin-bottom:30px;}
+.public-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.public-secondary-btn{height:48px;border-radius:15px;padding:0 18px;border:1px solid var(--border);background:rgba(255,255,255,.045);color:var(--text);font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;}
+.public-preview{border:1px solid var(--border);background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border-radius:30px;padding:24px;box-shadow:0 40px 100px rgba(0,0,0,.34);backdrop-filter:blur(24px);}
+.public-preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.public-preview-title{font-size:.76rem;color:var(--muted2);font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+.public-status{font-size:.7rem;color:var(--green);font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.2);}
+.public-card-stack{display:grid;gap:14px;}
+.public-product-card{padding:18px;border-radius:20px;background:rgba(4,7,15,.52);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:14px;}
+.public-product-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(16,185,129,.14),rgba(139,92,246,.16));font-size:1.25rem;}
+.public-product-name{font-weight:900;margin-bottom:4px;}
+.public-product-sub{font-size:.75rem;color:var(--muted2);line-height:1.45;}
+.public-note{margin-top:18px;border-radius:18px;border:1px dashed rgba(16,185,129,.24);background:rgba(16,185,129,.055);padding:14px;color:var(--muted2);font-size:.78rem;line-height:1.6;}
+body.client-login-open #publicHome, body.is-authenticated #publicHome{display:none;}
+.login-back{margin-top:14px;background:none;border:0;color:var(--muted2);font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:4px;}
+.login-back:hover{color:var(--text);}
+@media(max-width:820px){#publicHome{padding:14px}.public-shell{min-height:calc(100vh - 28px)}.public-nav{height:auto;align-items:flex-start}.public-menu a{display:none}.public-hero{grid-template-columns:1fr;padding:44px 0 28px}.public-preview{padding:18px}.public-actions button{width:100%}}
+
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+#loginScreen{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:var(--bg);}
 #loginScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(16,185,129,0.1),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.1),transparent 50%);}
 .login-box{position:relative;z-index:1;width:90%;max-width:420px;background:rgba(10,15,28,0.92);border:1px solid rgba(255,255,255,0.09);border-radius:28px;padding:44px 36px 38px;text-align:center;box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(16,185,129,0.08);backdrop-filter:blur(30px);animation:popIn 0.5s cubic-bezier(.4,0,.2,1) both;}
 @keyframes popIn{from{opacity:0;transform:scale(0.94) translateY(14px)}to{opacity:1;transform:none}}
@@ -454,6 +493,53 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
 <body>
 <div class="ambient"><div class="ambient-orb orb1"></div><div class="ambient-orb orb2"></div><div class="ambient-orb orb3"></div></div>
 
+
+<!-- PUBLIC HOME -->
+<main id="publicHome">
+ <div class="public-shell">
+  <header class="public-nav">
+   <div class="public-brand">
+    <img src="https://i.ibb.co/6JP034RZ/Whats-App-Image-2026-01-30-at-18-18-51.jpg" alt="BoxPower">
+    <div>
+     <div class="public-brand-title">BoxPower</div>
+     <div class="public-brand-sub">Portal público</div>
+    </div>
+   </div>
+   <nav class="public-menu" aria-label="Menu principal">
+    <a href="#produtos">Produtos</a>
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#precos">Preços</a>
+    <button class="public-client-btn" type="button" onclick="openClientArea()">Área do Cliente</button>
+   </nav>
+  </header>
+
+  <section class="public-hero" id="produtos">
+   <div>
+    <div class="public-kicker">estrutura pública pronta</div>
+    <h1>Produtos de IA com acesso simples, suporte e <span>área exclusiva</span>.</h1>
+    <p>Esta é a nova estrutura pública da BoxPower. Em breve, este espaço receberá produtos, explicações detalhadas e preços. Clientes já ativos continuam acessando tudo pelo botão “Área do Cliente”.</p>
+    <div class="public-actions">
+     <button class="public-client-btn" type="button" onclick="openClientArea()">Entrar na Área do Cliente</button>
+     <button class="public-secondary-btn" type="button" onclick="document.getElementById('como-funciona').scrollIntoView({behavior:'smooth'})">Ver estrutura</button>
+    </div>
+   </div>
+
+   <aside class="public-preview" id="como-funciona">
+    <div class="public-preview-head">
+     <div class="public-preview-title">Base comercial</div>
+     <div class="public-status">Pronta</div>
+    </div>
+    <div class="public-card-stack">
+     <div class="public-product-card"><div class="public-product-icon">🎬</div><div><div class="public-product-name">VEO3 / Flow</div><div class="public-product-sub">Espaço reservado para apresentação do produto e benefícios.</div></div></div>
+     <div class="public-product-card"><div class="public-product-icon">⚙️</div><div><div class="public-product-name">BoxPower</div><div class="public-product-sub">Área futura para explicar acesso, recursos e suporte.</div></div></div>
+     <div class="public-product-card" id="precos"><div class="public-product-icon">💳</div><div><div class="public-product-name">Planos e preços</div><div class="public-product-sub">Bloco preparado para receber preços e chamadas comerciais.</div></div></div>
+    </div>
+    <div class="public-note">Clientes: usem o menu <strong>Área do Cliente</strong> para entrar com e-mail e PIN e visualizar seus dados personalizados.</div>
+   </aside>
+  </section>
+ </div>
+</main>
+
 <!-- LOGIN -->
 <div id="loginScreen">
  <div class="login-box">
@@ -474,6 +560,7 @@ body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-
   </div>
   <button class="btn-login" onclick="login()">ENTRAR</button>
   <div id="loginMsg"></div>
+  <button class="login-back" type="button" onclick="closeClientArea()">← Voltar ao site público</button>
  </div>
 </div>
 
@@ -874,6 +961,40 @@ function buildTutorialEmbedUrl(item){
 
 renderTutorialShelves();
 
+
+/* ── PUBLIC / CLIENT AREA STRUCTURE ── */
+function openClientArea(){
+ document.body.classList.add('client-login-open');
+ document.body.classList.remove('is-authenticated');
+ const msg=document.getElementById('loginMsg');
+ if(msg){msg.textContent='';msg.className='';}
+ setTimeout(()=>{try{document.getElementById('loginEmail').focus();}catch(_){}} ,60);
+}
+function closeClientArea(){
+ document.body.classList.remove('client-login-open');
+ const login=document.getElementById('loginScreen');
+ if(login) login.style.display='';
+}
+function enterAuthenticatedArea(){
+ document.body.classList.remove('client-login-open');
+ document.body.classList.add('is-authenticated');
+ const publicHome=document.getElementById('publicHome');
+ if(publicHome) publicHome.style.display='none';
+ const app=document.getElementById('app');
+ if(app) app.style.display='flex';
+ const loginScreen=document.getElementById('loginScreen');
+ if(loginScreen) loginScreen.style.display='none';
+}
+function returnToPublicHome(){
+ document.body.classList.remove('client-login-open','is-authenticated');
+ const app=document.getElementById('app');
+ if(app) app.style.display='none';
+ const publicHome=document.getElementById('publicHome');
+ if(publicHome) publicHome.style.display='flex';
+ const loginScreen=document.getElementById('loginScreen');
+ if(loginScreen) loginScreen.style.display='';
+}
+
 /* ── MOBILE SIDEBAR ── */
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
@@ -1087,8 +1208,7 @@ async function forcePortalEntry(client){
  setEl('sideUserName', nomeF);
  setEl('sideUserId', '#'+clientId);
  setEl('sideUserEmail', currentClient.email || '—');
- const loginScreen = document.getElementById('loginScreen');
- if(loginScreen) loginScreen.style.display='none';
+ enterAuthenticatedArea();
  showToast('Bem-vindo, '+nomeF+'!');
  showSection('produtos');
 
@@ -1112,7 +1232,7 @@ async function enterPortal(client){
  setEl('sideUserName',nomeF);
  setEl('sideUserId','#'+clientId);
  setEl('sideUserEmail',client.email||'');
- document.getElementById('loginScreen').style.display='none';
+ enterAuthenticatedArea();
  showToast('Bem-vindo, '+nomeF+'!');
 
  const loaders = [
@@ -1143,7 +1263,7 @@ async function doLogout(){
  await sb.auth.signOut().catch(()=>{});
  currentClient=null;
  currentPin=null;
- document.getElementById('loginScreen').style.display='flex';
+ returnToPublicHome();
  document.getElementById('loginEmail').value='';
  document.getElementById('loginPass').value='';
  showToast('Até logo!');
