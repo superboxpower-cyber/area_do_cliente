@@ -1269,6 +1269,14 @@ async function loadProducts(client){
             </div>
            </div>
           </div>
+          <div class="cred-field full">
+           <div class="cred-field-label">Cadastro / troca de IP</div>
+           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input id="boxpower-ip-input" inputmode="text" placeholder="Cole seu IPv4 ou IPv6 aqui" style="flex:1;min-width:190px;height:42px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);padding:0 14px;font-family:'Outfit',sans-serif;outline:none;">
+            <button class="btn-reveal" id="boxpower-ip-btn" onclick="requestBoxPowerIp(${slotIndex})" style="height:42px;padding:0 14px;">🌐 Atualizar IP</button>
+           </div>
+           <div id="boxpower-ip-msg" style="margin-top:9px;font-size:.76rem;color:var(--muted2);line-height:1.45;">Use para cadastrar o primeiro IP ou trocar o IP atual da whitelist.</div>
+          </div>
          </div>`;
        }
      } else if (pid === '01ccb898-f88f-4bd3-8bd9-33650abf961c') {
@@ -1563,6 +1571,52 @@ function getPortalSecret(kind, index=1){
  return { email:'', password:'' };
 }
 
+async function requestBoxPowerIp(slotIndex=1){
+ const input=document.getElementById('boxpower-ip-input');
+ const btn=document.getElementById('boxpower-ip-btn');
+ const msg=document.getElementById('boxpower-ip-msg');
+ const ip=String(input?.value || '').trim();
+ const setMsg=(text,kind='info')=>{if(msg){msg.textContent=text;msg.style.color=kind==='ok'?'var(--green)':(kind==='warn'?'var(--red)':'var(--muted2)');}};
+ if(btn) btn.disabled=true;
+ try{
+  if(!currentClient?.email || !currentPin){ toast('Faça login novamente.','warn'); return; }
+  if(!ip){ setMsg('Cole o IPv4 ou IPv6 em texto antes de enviar.','warn'); return; }
+  const syncRes = await syncCurrentPortalState();
+  if(!syncRes.ok || !currentClient){ toast('Erro ao validar acesso. Faça login novamente.','warn'); return; }
+  const productState = getPortalProductState(slotIndex, '1c13544a-1435-4071-a10a-566e80cad327', currentClient);
+  if(productState?.cycle?.expired){ setMsg('Assinatura BoxPower vencida. Renove para atualizar IP.','warn'); return; }
+  if(productState?.missing_cycle){ setMsg('BoxPower bloqueado no portal.','warn'); return; }
+  if(btn) btn.textContent='⏳ Atualizando...';
+  setMsg('Validando e aplicando IP na whitelist...');
+  const response = await fetch(`${PORTAL_IP_REQUEST_URL}?ts=${Date.now()}`, {
+   method:'POST', cache:'no-store', headers:{'Content-Type':'application/json'},
+   body: JSON.stringify({ email: currentClient.email, pin: currentPin, ip })
+  });
+  let payload=null;try{payload=await response.json();}catch(_){ }
+  if(!response.ok || !payload?.ok){
+   const err=String(payload?.error || 'ip_failed');
+   const map={
+    missing_fields:'Informe o IP antes de enviar.',
+    invalid_credentials:'Sessão inválida. Faça login novamente.',
+    ip_not_found:'Não encontrei um IP válido no texto enviado.',
+    multiple_ips:'Encontrei mais de um IP. Envie apenas um IP por vez.',
+    invalid_ip:'O IP parece inválido. Confira e tente novamente.',
+    blacklisted_ip:'Este IP não pode ser cadastrado. Chame o suporte.',
+    boxpower_inactive_or_expired:'BoxPower vencido ou inativo. Renove para atualizar IP.',
+    already_processing:'Já existe uma atualização de IP em andamento. Aguarde um instante.',
+    cooldown:'Aguarde alguns segundos antes de solicitar outra troca.',
+    add_failed:'Não consegui adicionar o IP agora. O suporte foi avisado.'
+   };
+   setMsg(map[err] || 'Não consegui atualizar o IP agora. Chame o suporte.', 'warn');
+   return;
+  }
+  const action = payload.action === 'changed' ? 'IP trocado com sucesso!' : 'IP cadastrado com sucesso!';
+  setMsg(`${action} IP liberado: ${payload.ip}. Teste o acesso agora.`, 'ok');
+  showToast(action);
+ }catch(e){setMsg('Erro ao atualizar IP. Tente novamente em instantes.','warn');}
+ finally{if(btn){btn.disabled=false;btn.textContent='🌐 Atualizar IP';}}
+}
+
 async function revealPortalCredential(opts={}){
  const { kind, index=1, productId, slotIndex=1, emailFieldId=null, passFieldId, dotsFieldId, copyBtnId=null, buttonId, timerId=null, hideMs=15000 } = opts;
  const rb=document.getElementById(buttonId);if(rb)rb.disabled=true;
@@ -1700,6 +1754,7 @@ const VEO_OPTIMIZER_URL = 'https://api.boxpower.store/veo/optimize';
 const PORTAL_LOGIN_URL = 'https://api.boxpower.store/portal/login';
 const PORTAL_LOGIN_LOG_URL = 'https://api.boxpower.store/portal/login-log';
 const PORTAL_VEO_CODE_URL = 'https://api.boxpower.store/portal/veo-code';
+const PORTAL_IP_REQUEST_URL = 'https://api.boxpower.store/portal/ip-request';
 const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
 
 async function sendPortalLoginLog(payload){
