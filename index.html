@@ -1610,7 +1610,7 @@ async function requestBoxPowerIp(slotIndex=1){
    setMsg(map[err] || 'Não consegui atualizar o IP agora. Chame o suporte.', 'warn');
    return;
   }
-  const action = payload.action === 'changed' ? 'IP trocado com sucesso!' : 'IP cadastrado com sucesso!';
+  const action = payload.action === 'changed' ? 'IP trocado com sucesso!' : (payload.action === 'already_current' ? 'Este IP já estava liberado!' : 'IP cadastrado com sucesso!');
   setMsg(`${action} IP liberado: ${payload.ip}. Teste o acesso agora.`, 'ok');
   showToast(action);
  }catch(e){setMsg('Erro ao atualizar IP. Tente novamente em instantes.','warn');}
