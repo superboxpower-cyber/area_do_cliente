@@ -1465,7 +1465,9 @@ async function loadProducts(client){
                <a href="https://labs.google/fx/pt/tools/flow" target="_blank" rel="noopener">
                  <button class="btn-login" style="width:auto;padding:0 24px;height:36px;font-size:0.82rem;">🚀 Ir para o Flow</button>
                </a>
+               <button class="btn-reveal" id="veo3-problem-btn" onclick="reportVeo3Problem(${slotIndex})" style="height:36px;padding:0 14px;font-size:0.78rem;border-color:rgba(239,68,68,.28);color:#fecaca;background:rgba(239,68,68,.08);">⚠️ Reportar senha/conta</button>
              </div>
+             <div style="font-size:.72rem;color:var(--muted2);line-height:1.45;margin-top:10px;max-width:520px;margin-left:auto;margin-right:auto;">Use o reporte apenas se a senha não entrar ou se o Google informar conta desativada/suspensa. Erro ao gerar vídeo, fila, limite ou prompt recusado não entra aqui.</div>
            </div>
          </div>`;
        }
@@ -1790,6 +1792,47 @@ async function revealPortalCredential(opts={}){
 
 let veo3CodeCountdownTimer = null;
 
+async function reportVeo3Problem(slotIndex=1){
+ const btn=document.getElementById('veo3-problem-btn');
+ if(btn) btn.disabled=true;
+ try{
+  if(!currentClient?.email || !currentPin){ toast('Faça login novamente.','warn'); return; }
+  const syncRes = await syncCurrentPortalState();
+  if(!syncRes.ok || !currentClient){ toast('Erro ao validar acesso. Faça login novamente.','warn'); return; }
+  const productState = getPortalProductState(slotIndex, '01ccb898-f88f-4bd3-8bd9-33650abf961c', currentClient);
+  if(productState?.cycle?.expired){ toast('Assinatura vencida. Renove para reportar acesso.','warn'); return; }
+  if(productState?.missing_cycle){ toast('Produto bloqueado no portal.','warn'); return; }
+  const ok = confirm('Use este botão SOMENTE se a senha da conta VEO3 não entra ou se o Google informou que a conta foi desativada/suspensa.\n\nSe for erro ao gerar vídeo, demora na fila, prompt recusado ou limite temporário, fale com o suporte.\n\nDeseja continuar?');
+  if(!ok) return;
+  const choice = prompt('Qual é o problema?\n\n1 - Senha foi trocada / senha não entra\n2 - Conta Google desativada/suspensa\n\nDigite 1 ou 2:');
+  const reason = String(choice||'').trim()==='1' ? 'password_changed' : (String(choice||'').trim()==='2' ? 'account_disabled' : '');
+  if(!reason){ toast('Reporte cancelado. Escolha 1 ou 2.','warn'); return; }
+  if(btn) btn.textContent='⏳ Reportando...';
+  const response = await fetch(`${PORTAL_VEO3_REPORT_URL}?ts=${Date.now()}`, {
+   method:'POST', cache:'no-store', headers:{'Content-Type':'application/json'},
+   body: JSON.stringify({ email: currentClient.email, pin: currentPin, reason })
+  });
+  let payload=null;try{payload=await response.json();}catch(_){ }
+  if(!response.ok || !payload?.ok){
+   const err=String(payload?.error || 'report_failed');
+   const map={
+    unsupported_reason:'Esse tipo de problema não gera redistribuição automática.',
+    invalid_credentials:'Sessão inválida. Faça login novamente.',
+    veo_inactive_or_expired:'VEO3 vencido ou inativo.',
+    missing_veo_credential:'Credencial VEO3 não localizada. Chame o suporte.'
+   };
+   toast(map[err] || 'Não consegui registrar o reporte agora. Chame o suporte.','warn');
+   return;
+  }
+  if(payload.action==='auto_redistributed'){
+   toast('Reporte confirmado. A conta foi enviada para correção automática. Atualize o portal em instantes.');
+  } else {
+   toast(`Reporte registrado. Se outro membro da mesma conta confirmar, a correção automática será acionada.`);
+  }
+ }catch(e){toast('Erro ao registrar reporte. Tente novamente.','warn');}
+ finally{if(btn){btn.disabled=false;btn.textContent='⚠️ Reportar senha/conta';}}
+}
+
 async function requestVeo3Code(slotIndex=1){
  const btn=document.getElementById('veo3-code-btn');
  const box=document.getElementById('veo3-code-box');
@@ -1895,6 +1938,7 @@ const VEO_OPTIMIZER_URL = 'https://api.boxpower.store/veo/optimize';
 const PORTAL_LOGIN_URL = 'https://api.boxpower.store/portal/login';
 const PORTAL_LOGIN_LOG_URL = 'https://api.boxpower.store/portal/login-log';
 const PORTAL_VEO_CODE_URL = 'https://api.boxpower.store/portal/veo-code';
+const PORTAL_VEO3_REPORT_URL = 'https://api.boxpower.store/portal/veo3-problem-report';
 const PORTAL_IP_REQUEST_URL = 'https://api.boxpower.store/portal/ip-request';
 const VEO_OPTIMIZER_TOKEN = 'boxpower-veo-optimizer-2026';
 
