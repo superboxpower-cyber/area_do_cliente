@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprar | BoxPower</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#04070f;--card:rgba(10,15,28,.88);--line:rgba(255,255,255,.09);--text:#fff;--muted:#9aa8c7;--green:#10b981;--purple:#7c3aed;}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Outfit,system-ui,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(16,185,129,.16),transparent 32%),radial-gradient(circle at 80% 0%,rgba(124,58,237,.18),transparent 36%),var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px;}
+    .box{width:min(720px,100%);background:var(--card);border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(0,0,0,.55);}
+    .tag{display:inline-flex;padding:8px 12px;border:1px solid rgba(16,185,129,.24);background:rgba(16,185,129,.1);border-radius:999px;color:var(--green);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
+    h1{font-size:clamp(2rem,5vw,3.4rem);line-height:.95;margin:22px 0 14px;letter-spacing:-.05em;}
+    p{font-size:1.05rem;line-height:1.65;color:var(--muted);margin:0 0 22px;}
+    .product{display:flex;gap:16px;align-items:flex-start;padding:18px;border-radius:20px;background:rgba(4,7,15,.52);border:1px solid var(--line);margin:24px 0;}
+    .icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:16px;background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(124,58,237,.2));font-size:1.35rem;flex:0 0 auto;}
+    .name{font-weight:900;font-size:1.2rem;margin-bottom:6px}.sub{color:var(--muted);line-height:1.45;}
+    .note{font-size:.92rem;color:#c5d0ea;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:16px;}
+    a{color:inherit}.back{display:inline-flex;margin-top:20px;color:var(--green);font-weight:800;text-decoration:none;}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <span class="tag">Página de compra</span>
+    <h1>Produtos BoxPower</h1>
+    <p>Esta página já está reservada para o fluxo de compra direto pelo site. Em breve ela receberá formulário, pagamento e liberação automática conforme as próximas especificações.</p>
+    <section class="product" id="g-ultra-veo3">
+      <div class="icon">🎬</div>
+      <div>
+        <div class="name">G-ULTRA - VEO3 ilimitado</div>
+        <div class="sub">Acesso compartilhado com e-mail e senha direto no site do Flow.</div>
+      </div>
+    </section>
+    <div class="note">Status: estrutura inicial pronta. Próximo passo: definir campos, preço, PIX/checkout e automação de cadastro/liberação.</div>
+    <a class="back" href="./">← Voltar para a página inicial</a>
+  </main>
+</body>
+</html>
