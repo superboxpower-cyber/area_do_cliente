@@ -3,36 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Comprar | BoxPower</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <title>G-ULTRA VEO3 | BoxPower</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#04070f;--card:rgba(10,15,28,.88);--line:rgba(255,255,255,.09);--text:#fff;--muted:#9aa8c7;--green:#10b981;--purple:#7c3aed;}
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Outfit,system-ui,sans-serif;background:radial-gradient(circle at 20% 10%,rgba(16,185,129,.16),transparent 32%),radial-gradient(circle at 80% 0%,rgba(124,58,237,.18),transparent 36%),var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:24px;}
-    .box{width:min(720px,100%);background:var(--card);border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(0,0,0,.55);}
-    .tag{display:inline-flex;padding:8px 12px;border:1px solid rgba(16,185,129,.24);background:rgba(16,185,129,.1);border-radius:999px;color:var(--green);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
-    h1{font-size:clamp(2rem,5vw,3.4rem);line-height:.95;margin:22px 0 14px;letter-spacing:-.05em;}
-    p{font-size:1.05rem;line-height:1.65;color:var(--muted);margin:0 0 22px;}
-    .product{display:flex;gap:16px;align-items:flex-start;padding:18px;border-radius:20px;background:rgba(4,7,15,.52);border:1px solid var(--line);margin:24px 0;}
-    .icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:16px;background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(124,58,237,.2));font-size:1.35rem;flex:0 0 auto;}
-    .name{font-weight:900;font-size:1.2rem;margin-bottom:6px}.sub{color:var(--muted);line-height:1.45;}
-    .note{font-size:.92rem;color:#c5d0ea;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:16px;}
-    a{color:inherit}.back{display:inline-flex;margin-top:20px;color:var(--green);font-weight:800;text-decoration:none;}
+    :root{
+      --bg:#04070f;--card:rgba(10,15,28,.9);--line:rgba(255,255,255,.09);--text:#fff;--muted:#9aa8c7;
+      --green:#10b981;--green2:#34d399;--purple:#7c3aed;--pink:#ec4899;--danger:#fb7185;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;font-family:Outfit,system-ui,sans-serif;
+      background:
+        radial-gradient(circle at 16% 10%,rgba(16,185,129,.18),transparent 34%),
+        radial-gradient(circle at 86% 2%,rgba(124,58,237,.22),transparent 38%),
+        radial-gradient(circle at 50% 100%,rgba(236,72,153,.1),transparent 36%),
+        var(--bg);
+      color:var(--text);padding:24px;
+    }
+    body.modal-open{overflow:hidden}
+    .shell{width:min(1040px,100%);margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:start;}
+    .box,.side-card{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:0 30px 90px rgba(0,0,0,.55);backdrop-filter:blur(20px);}
+    .box{padding:34px}.side-card{padding:26px;position:sticky;top:24px}
+    .tag{display:inline-flex;padding:8px 12px;border:1px solid rgba(16,185,129,.24);background:rgba(16,185,129,.1);border-radius:999px;color:var(--green2);font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
+    h1{font-size:clamp(2.2rem,5vw,4.2rem);line-height:.92;margin:22px 0 16px;letter-spacing:-.06em;}
+    .lead{font-size:1.08rem;line-height:1.72;color:#c9d4ee;margin:0 0 18px;}
+    .lead strong{color:#fff}.price-alert{color:#fff;background:linear-gradient(135deg,rgba(251,113,133,.13),rgba(124,58,237,.12));border:1px solid rgba(251,113,133,.22);padding:16px;border-radius:18px;margin:20px 0;line-height:1.58;}
+    .features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 22px;padding:0;list-style:none;}
+    .features li{display:flex;align-items:center;gap:10px;color:#e8eefc;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:15px;padding:12px;font-weight:800;}
+    .features li:before{content:"✓";width:22px;height:22px;border-radius:999px;background:rgba(16,185,129,.16);color:var(--green2);display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;flex:0 0 auto;}
+    .cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:24px}.cta{border:0;border-radius:18px;padding:18px 24px;background:linear-gradient(135deg,var(--green),var(--purple));color:#fff;font-family:Outfit,sans-serif;font-weight:900;font-size:1rem;letter-spacing:.04em;cursor:pointer;box-shadow:0 18px 50px rgba(16,185,129,.28),0 10px 35px rgba(124,58,237,.18),inset 0 1px 0 rgba(255,255,255,.2);transition:.2s;}
+    .cta:hover{transform:translateY(-2px);box-shadow:0 24px 62px rgba(16,185,129,.36),0 14px 42px rgba(124,58,237,.24)}
+    .micro{color:var(--muted);font-size:.9rem;line-height:1.45}.back{display:inline-flex;margin-top:24px;color:var(--green2);font-weight:800;text-decoration:none;}
+    .product{display:flex;gap:16px;align-items:flex-start;padding:18px;border-radius:22px;background:rgba(4,7,15,.55);border:1px solid var(--line);margin-bottom:18px;}
+    .icon{width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(124,58,237,.22));font-size:1.55rem;flex:0 0 auto;}
+    .name{font-weight:900;font-size:1.28rem;margin-bottom:7px}.sub{color:var(--muted);line-height:1.45;}.spots{margin-top:18px;padding:16px;border-radius:18px;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.18);color:#d8fff1;font-weight:800;line-height:1.45;}
+    .mini-list{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:10px}.mini-list li{display:flex;gap:10px;color:#cbd6ef;line-height:1.4}.mini-list span{color:var(--green2);font-weight:900}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);z-index:20;backdrop-filter:blur(10px)}
+    .modal.show{display:flex}.modal-card{width:min(940px,100%);max-height:92vh;overflow:auto;background:#07101f;border:1px solid rgba(255,255,255,.12);border-radius:28px;box-shadow:0 40px 120px rgba(0,0,0,.75);position:relative;}
+    .modal-head{padding:24px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.modal-title{font-size:1.55rem;font-weight:900;letter-spacing:-.03em}.close{border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;width:42px;height:42px;border-radius:14px;font-size:1.4rem;cursor:pointer;}
+    .modal-body{padding:26px;display:grid;grid-template-columns:1fr 340px;gap:22px}.pay-text{color:#cbd6ef;line-height:1.62;margin:0 0 18px}.form{display:grid;gap:12px}.field label{display:block;font-size:.82rem;font-weight:900;color:#d9e3fa;margin:0 0 7px}.field input{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.055);color:#fff;padding:0 14px;font-family:Outfit,sans-serif;font-size:1rem;outline:none}.field input:focus{border-color:rgba(16,185,129,.55);box-shadow:0 0 0 4px rgba(16,185,129,.1)}
+    .pix-card{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}.qr{width:220px;max-width:100%;aspect-ratio:1;border-radius:18px;background:#fff;padding:10px;margin:4px auto 14px;display:block}.pix-label{font-size:.78rem;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em}.pix-code{margin:8px 0 12px;padding:12px;border-radius:14px;background:rgba(4,7,15,.72);border:1px solid var(--line);color:#eaf2ff;font-size:.88rem;word-break:break-all;line-height:1.45}.copy{width:100%;border:0;border-radius:15px;padding:14px 16px;background:linear-gradient(135deg,var(--green),var(--green2));color:#03130d;font-family:Outfit,sans-serif;font-weight:900;cursor:pointer}.whats{display:block;margin-top:12px;border-radius:15px;padding:14px 16px;text-decoration:none;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.22);color:#d9fff1;font-weight:900}.small{font-size:.82rem;color:var(--muted);line-height:1.45;margin-top:12px}.done{display:none;margin-top:10px;color:var(--green2);font-weight:900;font-size:.9rem}
+    @media (max-width:860px){body{padding:14px}.shell{grid-template-columns:1fr}.side-card{position:static}.box{padding:24px}.features{grid-template-columns:1fr}.modal-body{grid-template-columns:1fr}.modal-head{padding:20px}.modal-body{padding:20px}}
   </style>
 </head>
 <body>
-  <main class="box">
-    <span class="tag">Página de compra</span>
-    <h1>Produtos BoxPower</h1>
-    <p>Esta página já está reservada para o fluxo de compra direto pelo site. Em breve ela receberá formulário, pagamento e liberação automática conforme as próximas especificações.</p>
-    <section class="product" id="g-ultra-veo3">
-      <div class="icon">🎬</div>
-      <div>
-        <div class="name">G-ULTRA - VEO3 ilimitado</div>
-        <div class="sub">Acesso compartilhado com e-mail e senha direto no site do Flow.</div>
+  <main class="shell">
+    <section class="box">
+      <span class="tag">G-ULTRA · VEO3 ilimitado</span>
+      <h1>Produza criativos com VEO3 sem se preocupar com créditos.</h1>
+      <p class="lead">Olá, você conhece a <strong>BoxPower</strong>? Gerenciamos alguns grupos de rateio da conta <strong>ULTRA da Google</strong>. A conta ULTRA é a melhor conta da Google e possui a modalidade que permite gerar vídeos ilimitados com o VEO3. Sim! Você vai conseguir produzir seus criativos sem se preocupar com créditos.</p>
+      <div class="price-alert">Comprando diretamente pela Google, essa conta custa cerca de <strong>R$600,00 nos 3 primeiros meses</strong> e depois passa para <strong>R$1.200,00</strong> 😬</div>
+      <p class="lead">Para viabilizar e torná-lo acessível, organizamos grupos de rateio com <strong>6 membros fixos</strong>. Monitoramos o uso dos créditos e, se as contas tiverem problemas, damos garantia de reposição durante os <strong>30 dias contratados</strong>.</p>
+      <p class="lead">O acesso é composto por <strong>e-mail e senha</strong>. Com esse login você consegue acessar ferramentas da Google como:</p>
+      <ul class="features">
+        <li>Flow</li>
+        <li>Gemini Ultra</li>
+        <li>Whisk</li>
+        <li>NotebookLM</li>
+      </ul>
+      <p class="lead"><strong>Estamos fechando novas turmas agora</strong> — as vagas são limitadas: apenas 6 por grupo. 🔥</p>
+      <div class="cta-row">
+        <button class="cta" type="button" id="openPayment">QUERO PARTICIPAR</button>
+        <span class="micro">Pagamento via PIX. Após o comprovante, a equipe confirma seus dados e libera o acesso.</span>
       </div>
+      <a class="back" href="./">← Voltar para a página inicial</a>
     </section>
-    <div class="note">Status: estrutura inicial pronta. Próximo passo: definir campos, preço, PIX/checkout e automação de cadastro/liberação.</div>
-    <a class="back" href="./">← Voltar para a página inicial</a>
+
+    <aside class="side-card">
+      <section class="product" id="g-ultra-veo3">
+        <div class="icon">🎬</div>
+        <div>
+          <div class="name">G-ULTRA - VEO3 ilimitado</div>
+          <div class="sub">Acesso compartilhado com e-mail e senha direto no site do Flow.</div>
+        </div>
+      </section>
+      <div class="spots">QUERO PARTICIPAR? Garanta sua vaga em uma turma com até 6 membros.</div>
+      <ul class="mini-list">
+        <li><span>01</span> Preencha seus dados no formulário.</li>
+        <li><span>02</span> Faça o PIX usando o QR Code ou copia e cola.</li>
+        <li><span>03</span> Envie o comprovante para confirmação e liberação.</li>
+      </ul>
+    </aside>
   </main>
+
+  <div class="modal" id="paymentModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+      <div class="modal-head">
+        <div>
+          <div class="tag">Pagamento PIX</div>
+          <div class="modal-title" id="paymentTitle">Entrar para o grupo G-ULTRA VEO3</div>
+        </div>
+        <button class="close" type="button" id="closePayment" aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body">
+        <section>
+          <p class="pay-text">Depois do pagamento, nossa equipe valida seus dados e libera seu acesso do grupo. Você receberá as orientações para acessar as ferramentas Google pelo e-mail e senha do grupo contratado. A garantia de reposição vale durante os 30 dias do acesso.</p>
+          <form class="form" id="leadForm">
+            <div class="field"><label for="name">Seu nome</label><input id="name" name="name" autocomplete="name" placeholder="Nome completo"></div>
+            <div class="field"><label for="whatsapp">WhatsApp</label><input id="whatsapp" name="whatsapp" inputmode="tel" autocomplete="tel" placeholder="(DDD) 99999-9999"></div>
+            <div class="field"><label for="email">E-mail para contato</label><input id="email" name="email" type="email" autocomplete="email" placeholder="seuemail@exemplo.com"></div>
+          </form>
+          <p class="small">Após pagar, envie o comprovante pelo WhatsApp para acelerar a conferência. Na próxima etapa, esta página poderá registrar o pedido automaticamente.</p>
+        </section>
+        <aside class="pix-card">
+          <img class="qr" alt="QR Code PIX" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=ee95abf4-584e-4c1f-9043-11171228b405">
+          <div class="pix-label">PIX copia e cola</div>
+          <div class="pix-code" id="pixCode">ee95abf4-584e-4c1f-9043-11171228b405</div>
+          <button class="copy" type="button" id="copyPix">Copiar PIX</button>
+          <div class="done" id="copyDone">PIX copiado ✅</div>
+          <a class="whats" href="https://wa.me/5547988707781?text=Ol%C3%A1%2C%20quero%20participar%20do%20grupo%20G-ULTRA%20VEO3%20da%20BoxPower.%20J%C3%A1%20fiz%20o%20PIX%20e%20vou%20enviar%20o%20comprovante." target="_blank" rel="noopener">Enviar comprovante no WhatsApp</a>
+          <p class="small">Chave PIX operacional BoxPower. O QR Code acima representa a chave para pagamento.</p>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('paymentModal');
+    const openBtn = document.getElementById('openPayment');
+    const closeBtn = document.getElementById('closePayment');
+    const copyBtn = document.getElementById('copyPix');
+    const copyDone = document.getElementById('copyDone');
+    const pixCode = document.getElementById('pixCode').textContent.trim();
+    function openModal(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
+    function closeModal(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event)=>{if(event.target===modal) closeModal();});
+    document.addEventListener('keydown', (event)=>{if(event.key==='Escape') closeModal();});
+    copyBtn.addEventListener('click', async ()=>{
+      try{await navigator.clipboard.writeText(pixCode);}
+      catch(e){const t=document.createElement('textarea');t.value=pixCode;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}
+      copyDone.style.display='block';setTimeout(()=>copyDone.style.display='none',2200);
+    });
+  </script>
 </body>
 </html>
